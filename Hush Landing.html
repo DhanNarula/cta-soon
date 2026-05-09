@@ -676,12 +676,10 @@ window.addEventListener('scroll', () => {
 function heroGo() { openModal(document.getElementById('hero-name').value.trim()); }
 function ctaGo()  { openModal(document.getElementById('cta-name').value.trim()); }
 
-// --- modal ---
+// --- modal → redirect to real app ---
 function openModal(name) {
-  document.getElementById('modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  if (name) document.getElementById('mname').value = name;
-  step(1);
+  const url = 'app.html?create=1' + (name ? '&name=' + encodeURIComponent(name) : '');
+  window.location.href = url;
 }
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
