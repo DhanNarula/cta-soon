@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hush — A new bedtime story every night. Starring your child.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          serif: ['Newsreader', 'Source Serif Pro', 'ui-serif', 'Georgia', 'serif'],
+          sans:  ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          cream:    '#FAF6F0',
+          cream2:   '#F0E9DD',
+          cream3:   '#E6DCCB',
+          coral:    '#D97757',
+          coralDk:  '#C25E3F',
+          sage:     '#9CAF88',
+          sageDk:   '#6F8868',
+          ink:      '#2D2A26',
+          ink2:     '#5C5750',
+          ink3:     '#8A847A',
+        },
+        borderRadius: { card: '16px', btn: '12px' },
+        boxShadow: {
+          soft:  '0 4px 24px rgba(0,0,0,0.04)',
+          soft2: '0 8px 40px rgba(0,0,0,0.06)',
+          lift:  '0 18px 60px -20px rgba(45,42,38,0.25)',
+        },
+        letterSpacing: { tightish: '-0.018em', tighter2: '-0.03em' },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; color: #2D2A26; background: #FAF6F0; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .font-serif { font-feature-settings: "ss01","liga"; }
+
+  /* Paper grain — layered noise + warm wash */
+  .paper-grain { position: relative; }
+  .paper-grain::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1200px 600px at 85% 0%, rgba(217,119,87,0.06), transparent 60%),
+      radial-gradient(900px 500px at 0% 30%, rgba(156,175,136,0.05), transparent 60%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0 0.14  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: auto, auto, 220px 220px;
+    mix-blend-mode: multiply; opacity: 0.85;
+  }
+
+  /* subtle striped placeholder for image slots */
+  .stripes-cream {
+    background-image: repeating-linear-gradient(135deg, #EFE6D5 0 12px, #E8DDC7 12px 24px);
+  }
+  .stripes-coral {
+    background-image: repeating-linear-gradient(135deg, rgba(217,119,87,0.18) 0 10px, rgba(217,119,87,0.10) 10px 20px), linear-gradient(#FAF6F0,#FAF6F0);
+  }
+  .stripes-sage {
+    background-image: repeating-linear-gradient(135deg, rgba(156,175,136,0.22) 0 10px, rgba(156,175,136,0.12) 10px 20px), linear-gradient(#FAF6F0,#FAF6F0);
+  }
+  .stripes-ink {
+    background-image: repeating-linear-gradient(135deg, rgba(45,42,38,0.12) 0 10px, rgba(45,42,38,0.06) 10px 20px), linear-gradient(#FAF6F0,#FAF6F0);
+  }
+
+  .small-caps { letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; font-size: 12px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 12px; font-weight: 600; transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease; }
+  .btn:hover { transform: translateY(-1px) scale(1.02); }
+  .btn-coral { background: #D97757; color: #FFF8F1; padding: 0.85rem 1.25rem; box-shadow: 0 6px 18px -6px rgba(217,119,87,0.5); }
+  .btn-coral:hover { background: #C25E3F; box-shadow: 0 10px 26px -6px rgba(217,119,87,0.55); }
+  .btn-cream { background: #FFF8F1; color: #C25E3F; padding: 0.95rem 1.4rem; box-shadow: 0 6px 18px -6px rgba(0,0,0,0.18); }
+  .btn-ghost { color: #2D2A26; padding: 0.85rem 0.6rem; }
+  .btn-ghost:hover { color: #C25E3F; }
+
+  /* Nav scroll state */
+  #nav { transition: background-color .25s ease, box-shadow .25s ease, border-color .25s ease, backdrop-filter .25s ease; }
+  #nav.scrolled { background: rgba(250,246,240,0.82); backdrop-filter: saturate(140%) blur(10px); border-color: rgba(45,42,38,0.06); box-shadow: 0 1px 0 rgba(45,42,38,0.04); }
+
+  /* Storybook spread */
+  .book {
+    position: relative; width: 100%; aspect-ratio: 1.35 / 1;
+    background: linear-gradient(180deg,#FFF8EC 0%, #F4E7CF 100%);
+    border-radius: 10px;
+    box-shadow: 0 30px 60px -30px rgba(45,42,38,0.45), 0 12px 30px -10px rgba(45,42,38,0.18);
+  }
+  .book::before {
+    content: ""; position: absolute; left: 50%; top: 4%; bottom: 4%; width: 28px; transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(0,0,0,0.18), transparent 70%);
+    filter: blur(2px);
+  }
+  .book::after {
+    content: ""; position: absolute; left: 1.5%; right: 1.5%; bottom: -6px; height: 10px;
+    background: linear-gradient(180deg, #EAD9B6, #C9B58A);
+    border-radius: 0 0 4px 4px; opacity: 0.7;
+  }
+  .page { position: absolute; top: 5%; bottom: 5%; width: 47.5%; padding: 6%; }
+  .page.left  { left: 2.5%; }
+  .page.right { right: 2.5%; }
+
+  /* Book cover styles */
+  .cover {
+    position: relative; aspect-ratio: 0.7 / 1; border-radius: 6px;
+    box-shadow: 0 18px 36px -16px rgba(45,42,38,0.45), 0 6px 14px -6px rgba(45,42,38,0.2);
+    overflow: hidden; transform-origin: bottom center;
+    transition: transform .35s ease, box-shadow .35s ease;
+  }
+  .cover:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 0 28px 50px -18px rgba(45,42,38,0.55); }
+  .cover .spine { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: rgba(0,0,0,0.18); }
+  .cover .title-area { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 14px 16px 14px; }
+
+  /* Hover preview */
+  .preview {
+    position: absolute; inset: 0; opacity: 0; transition: opacity .25s ease;
+    background: rgba(45,42,38,0.86); color: #FAF6F0;
+    display: flex; flex-direction: column; justify-content: flex-end; padding: 14px;
+    font-family: 'Newsreader', serif; font-style: italic; line-height: 1.5; font-size: 13px;
+    border-radius: 6px;
+  }
+  .cover:hover .preview { opacity: 1; }
+
+  /* FAQ */
+  details.faq { border-top: 1px solid rgba(45,42,38,0.10); }
+  details.faq:last-of-type { border-bottom: 1px solid rgba(45,42,38,0.10); }
+  details.faq summary { list-style: none; cursor: pointer; padding: 1.4rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  details.faq summary::-webkit-details-marker { display: none; }
+  details.faq .plus { width: 28px; height: 28px; border-radius: 999px; border: 1px solid rgba(45,42,38,0.18); display: inline-flex; align-items: center; justify-content: center; transition: transform .25s ease, background-color .2s ease, color .2s ease; flex: 0 0 auto; }
+  details.faq[open] .plus { transform: rotate(45deg); background: #D97757; color: #FFF8F1; border-color: #D97757; }
+  details.faq .answer { padding: 0 0 1.6rem 0; max-width: 62ch; color: #5C5750; }
+
+  /* Underline link */
+  .ulink { position: relative; }
+  .ulink::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: currentColor; opacity: 0.5; transition: opacity .2s ease; }
+  .ulink:hover::after { opacity: 1; }
+
+  /* card hover lift */
+  .feat:hover { transform: translateY(-3px); box-shadow: 0 12px 36px -16px rgba(45,42,38,0.18); }
+  .feat { transition: transform .25s ease, box-shadow .25s ease; }
+
+  /* tilted hero book wrapper */
+  .tilt { transform: rotate(4deg); }
+  @media (max-width: 768px) { .tilt { transform: rotate(2deg); } }
+
+  /* logos row */
+  .logo-mark { color: #8A847A; opacity: 0.85; transition: opacity .2s ease, color .2s ease; }
+  .logo-mark:hover { opacity: 1; color: #2D2A26; }
+
+  /* Carousel scroll */
+  .scroller { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .scroller > * { scroll-snap-align: start; }
+  .scroller::-webkit-scrollbar { height: 8px; }
+  .scroller::-webkit-scrollbar-thumb { background: rgba(45,42,38,0.15); border-radius: 999px; }
+
+  /* keyframes */
+  @keyframes twinkle { 0%,100% { opacity: 0.35 } 50% { opacity: 1 } }
+  .twinkle { animation: twinkle 4s ease-in-out infinite; }
+  .twinkle.delay-1 { animation-delay: 1.2s; }
+  .twinkle.delay-2 { animation-delay: 2.4s; }
+
+  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+  .float { animation: float 8s ease-in-out infinite; }
+</style>
+</head>
+<body class="bg-cream text-ink">
+
+<!-- NAV -->
+<header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2 group">
+      <svg viewBox="0 0 24 24" class="w-5 h-5 text-coral" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>
+      </svg>
+      <span class="font-serif text-[22px] tracking-tightish">Hush</span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8 text-[14.5px] text-ink2">
+      <a href="#how" class="hover:text-ink ulink">How it works</a>
+      <a href="#examples" class="hover:text-ink ulink">Examples</a>
+      <a href="#pricing" class="hover:text-ink ulink">Pricing</a>
+      <a href="#faq" class="hover:text-ink ulink">FAQ</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="#" class="hidden sm:inline text-[14.5px] text-ink2 hover:text-ink ulink">Sign in</a>
+      <a href="#cta" class="btn btn-coral text-[14.5px]">Create your first story free</a>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- HERO -->
+<section class="paper-grain pt-28 md:pt-36 pb-20 md:pb-28 relative overflow-hidden">
+  <svg class="absolute top-24 left-[6%] w-3 h-3 text-coral twinkle" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+  <svg class="absolute top-40 right-[8%] w-2.5 h-2.5 text-sage twinkle delay-1" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+  <svg class="absolute bottom-16 left-[12%] w-2 h-2 text-coral twinkle delay-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 items-center relative">
+    <div class="lg:col-span-7">
+      <p class="small-caps text-sageDk mb-5">Bedtime stories, made just for them</p>
+      <h1 class="font-serif text-[44px] sm:text-[56px] lg:text-[72px] leading-[1.02] tracking-tighter2 text-ink">
+        A new bedtime story
+        every night.
+        <span class="italic text-coral">Starring your child.</span>
+      </h1>
+      <p class="mt-7 text-[18px] md:text-[19px] text-ink2 max-w-[58ch]">
+        Tell us their name and what they love. We'll write and illustrate a one-of-a-kind story in 30 seconds. Ready by bedtime.
+      </p>
+
+      <div class="mt-9 flex flex-wrap items-center gap-4">
+        <a href="#cta" class="btn btn-coral text-[15px]">
+          Create your first story free
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#examples" class="btn btn-ghost text-[15px]">Read an example →</a>
+      </div>
+
+      <p class="mt-8 text-[13.5px] text-ink3">
+        Loved by 12,000+ families&nbsp; · &nbsp;Age 2 to 9&nbsp; · &nbsp;No credit card needed
+      </p>
+    </div>
+
+    <!-- Storybook spread mock -->
+    <div class="lg:col-span-5 relative">
+      <div class="tilt float relative max-w-[520px] mx-auto">
+        <div class="absolute -bottom-3 left-3 right-3 h-10 rounded-full" style="background: radial-gradient(closest-side, rgba(45,42,38,0.25), transparent 70%); filter: blur(8px);"></div>
+
+        <div class="book">
+          <!-- LEFT PAGE -->
+          <div class="page left">
+            <div class="h-full flex flex-col">
+              <p class="font-serif italic text-[13px] text-ink3 mb-3">Chapter Two</p>
+              <p class="font-serif text-[15px] md:text-[16px] leading-[1.55] text-ink">
+                Mira tiptoed past the moon-lamp and pushed open the door. Inside, the dragon was already yawning. <span class="italic">"You're late,"</span> he whispered, scales the colour of warm tea.
+              </p>
+              <p class="font-serif text-[15px] md:text-[16px] leading-[1.55] text-ink mt-3">
+                <span class="italic">"I brought you a story,"</span> said Mira, and she climbed up beside him.
+              </p>
+              <div class="mt-auto flex items-center justify-between text-[11px] text-ink3 font-serif italic">
+                <span>— 8 —</span>
+                <span>Mira and the Sleepy Dragon</span>
+              </div>
+            </div>
+          </div>
+          <!-- RIGHT PAGE: illustration placeholder -->
+          <div class="page right">
+            <div class="relative h-full rounded-md stripes-coral overflow-hidden border border-coral/20">
+              <svg class="absolute top-3 right-3 w-9 h-9 text-coral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+              <svg class="absolute top-6 left-5 w-2 h-2 text-coralDk" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+              <svg class="absolute top-10 left-12 w-1.5 h-1.5 text-coralDk" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+              <svg class="absolute bottom-0 left-0 right-0 w-full" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 60 Q 50 30 100 50 T 200 55 L 200 80 L 0 80 Z" fill="#C25E3F" opacity="0.55"/>
+                <path d="M0 70 Q 60 50 110 65 T 200 68 L 200 80 L 0 80 Z" fill="#C25E3F" opacity="0.85"/>
+              </svg>
+              <p class="absolute inset-x-0 bottom-2 text-center font-mono text-[10px] tracking-wider text-coralDk/70">illustration · spread 2</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- bookmark ribbon -->
+        <div class="absolute -top-2 right-12 w-3 h-16 bg-sage rounded-b-sm shadow"></div>
+
+        <p class="mt-6 text-center font-serif italic text-[13px] text-ink3">"Mira and the Sleepy Dragon" — generated for Mira, age 4, Brooklyn</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="py-12 md:py-14 border-y border-ink/[0.07]">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <p class="text-center small-caps text-ink3 mb-7">Featured in</p>
+    <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-16">
+      <span class="logo-mark font-serif italic text-[22px]">Parents</span>
+      <span class="logo-mark font-sans font-bold tracking-tightish text-[20px]">Romper</span>
+      <span class="logo-mark font-serif text-[22px] tracking-tightish">Today</span>
+      <span class="logo-mark font-serif text-[18px] tracking-tightish">NYT&nbsp;Parenting</span>
+      <span class="logo-mark font-sans font-semibold text-[18px]">TechCrunch</span>
+      <span class="logo-mark font-sans font-bold text-[18px] tracking-tighter2">Mashable</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="py-24 md:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="max-w-2xl">
+      <p class="small-caps text-sageDk mb-4">How it works</p>
+      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
+        From idea to "again, again!" in three small steps.
+      </h2>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-3 gap-10 md:gap-8">
+      <!-- Step 1 -->
+      <div class="relative">
+        <div class="w-full aspect-[5/4] rounded-card stripes-sage flex items-center justify-center mb-6 relative overflow-hidden">
+          <svg viewBox="0 0 120 100" class="w-3/5 h-3/5" aria-hidden="true">
+            <rect x="14" y="14" width="92" height="72" rx="8" fill="#FAF6F0" stroke="#6F8868" stroke-width="1.6"/>
+            <line x1="26" y1="34" x2="86" y2="34" stroke="#6F8868" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="26" y1="48" x2="94" y2="48" stroke="#6F8868" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="26" y1="62" x2="74" y2="62" stroke="#6F8868" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="98" cy="22" r="4" fill="#D97757"/>
+          </svg>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span class="font-serif italic text-coral text-[22px]">01</span>
+          <h3 class="font-serif text-[24px] tracking-tightish text-ink">Tell us about your child</h3>
+        </div>
+        <p class="mt-3 text-ink2 max-w-[36ch]">Their name, age, what they love — dinosaurs, space, kindness. The smaller the detail, the bigger the smile.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="relative md:mt-12">
+        <div class="w-full aspect-[5/4] rounded-card stripes-coral flex items-center justify-center mb-6 relative overflow-hidden">
+          <svg viewBox="0 0 120 100" class="w-3/5 h-3/5" aria-hidden="true">
+            <rect x="14" y="22" width="40" height="56" rx="6" fill="#FAF6F0" stroke="#C25E3F" stroke-width="1.6"/>
+            <rect x="62" y="14" width="44" height="64" rx="6" fill="#FAF6F0" stroke="#C25E3F" stroke-width="1.6"/>
+            <path d="M22 38 h24 M22 50 h20 M22 62 h16" stroke="#C25E3F" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M70 30 h28 M70 42 h28 M70 54 h22 M70 66 h18" stroke="#C25E3F" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="84" cy="14" r="4" fill="#D97757"/>
+          </svg>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span class="font-serif italic text-coral text-[22px]">02</span>
+          <h3 class="font-serif text-[24px] tracking-tightish text-ink">Choose tonight's adventure</h3>
+        </div>
+        <p class="mt-3 text-ink2 max-w-[36ch]">Pick a theme or lesson — sharing, courage, the moon. Or let us surprise you with something new.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="relative md:mt-24">
+        <div class="w-full aspect-[5/4] rounded-card stripes-cream flex items-center justify-center mb-6 relative overflow-hidden">
+          <svg viewBox="0 0 120 100" class="w-3/5 h-3/5" aria-hidden="true">
+            <path d="M14 30 Q 60 18 60 28 Q 60 18 106 30 L 106 78 Q 60 66 60 76 Q 60 66 14 78 Z"
+                  fill="#FAF6F0" stroke="#2D2A26" stroke-width="1.6" stroke-linejoin="round"/>
+            <line x1="60" y1="28" x2="60" y2="76" stroke="#2D2A26" stroke-width="1.2"/>
+            <path d="M22 40 h28 M22 50 h26 M22 60 h22" stroke="#2D2A26" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="86" cy="46" r="6" fill="#D97757"/>
+            <path d="M72 60 q14 -10 28 0" stroke="#2D2A26" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span class="font-serif italic text-coral text-[22px]">03</span>
+          <h3 class="font-serif text-[24px] tracking-tightish text-ink">Read together</h3>
+        </div>
+        <p class="mt-3 text-ink2 max-w-[36ch]">Story and illustrations ready in 30 seconds. Read on screen, listen to narration, or print.</p>
+      </div>
+    </div>
+
+    <div class="mt-16 flex justify-center">
+      <a href="#cta" class="btn btn-coral text-[15px]">Create your first story free
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE GRID -->
+<section class="bg-cream2 py-24 md:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="max-w-2xl mb-14">
+      <p class="small-caps text-sageDk mb-4">What's inside</p>
+      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
+        Built for the eight minutes that matter most.
+      </h2>
+      <p class="mt-5 text-[17px] text-ink2 max-w-[58ch]">Everything in Hush is shaped by one question — would we read this to our own kids tonight?</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="feat bg-cream rounded-card p-7 shadow-soft">
+        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        </div>
+        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Personalized characters</h3>
+        <p class="mt-2 text-ink2">Your child's name, age, and favorite things baked into every story.</p>
+      </div>
+
+      <div class="feat bg-cream rounded-card p-7 shadow-soft">
+        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4.5-6 4 5L15 11l6 8H3z"/><circle cx="8" cy="7" r="2"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        </div>
+        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Original illustrations</h3>
+        <p class="mt-2 text-ink2">Hand-styled AI art on every page. Never recycled, never stock.</p>
+      </div>
+
+      <div class="feat bg-cream rounded-card p-7 shadow-soft">
+        <div class="w-11 h-11 rounded-full bg-sage/15 text-sageDk flex items-center justify-center mb-5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Safe by default</h3>
+        <p class="mt-2 text-ink2">Filtered prompts, age-appropriate themes, parent-reviewed templates.</p>
+      </div>
+
+      <div class="feat bg-cream rounded-card p-7 shadow-soft">
+        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M16 8a4 4 0 0 1 0 8"/><path d="M19 5a8 8 0 0 1 0 14"/></svg>
+        </div>
+        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Audio narration</h3>
+        <p class="mt-2 text-ink2">A warm bedtime voice reads aloud while you cuddle.</p>
+      </div>
+
+      <div class="feat bg-cream rounded-card p-7 shadow-soft">
+        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="14" rx="1"/><path d="M6 17h12v4H6z"/><path d="M9 7h6M9 11h6"/></svg>
+        </div>
+        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Print or screen</h3>
+        <p class="mt-2 text-ink2">Send to print, save as PDF, or read in our app.</p>
+      </div>
+
+      <div class="feat bg-cream rounded-card p-7 shadow-soft">
+        <div class="w-11 h-11 rounded-full bg-sage/15 text-sageDk flex items-center justify-center mb-5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M4 17a3 3 0 0 1 3-3h12"/></svg>
+        </div>
+        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Personal library</h3>
+        <p class="mt-2 text-ink2">Every story saved forever in your child's collection.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAMPLES CAROUSEL -->
+<section id="examples" class="py-24 md:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="flex items-end justify-between gap-6 mb-12 flex-wrap">
+      <div class="max-w-2xl">
+        <p class="small-caps text-sageDk mb-4">Examples</p>
+        <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
+          Real stories, real kids. Hover to peek inside.
+        </h2>
+      </div>
+      <a href="#cta" class="hidden md:inline-flex btn btn-ghost text-[15px] text-ink hover:text-coral">Browse the library →</a>
+    </div>
+
+    <div class="scroller flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 lg:mx-0 lg:px-0">
+      <!-- Cover 1 -->
+      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#2D2A26 0%, #4A3F35 100%);">
+        <div class="spine"></div>
+        <div class="absolute inset-0 p-5">
+          <p class="small-caps text-coral/90 text-[10px]">A Hush original</p>
+          <svg class="absolute top-12 right-6 w-12 h-12 text-cream" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+          <svg class="absolute top-20 left-8 w-2 h-2 text-cream/80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+          <svg class="absolute top-28 left-16 w-1.5 h-1.5 text-cream/70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+          <svg class="absolute bottom-16 left-0 right-0 w-full" viewBox="0 0 200 60" preserveAspectRatio="none"><path d="M0 40 Q 60 10 120 30 T 200 35 L 200 60 L 0 60 Z" fill="#D97757" opacity="0.6"/><path d="M0 50 Q 50 30 110 45 T 200 50 L 200 60 L 0 60 Z" fill="#D97757"/></svg>
+        </div>
+        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(0,0,0,0.55));">
+          <p class="font-serif text-cream text-[20px] leading-tight tracking-tightish">Mira and the<br/>Sleepy Dragon</p>
+          <p class="mt-1 font-serif italic text-cream/70 text-[12px]">starring Mira, age 4</p>
+        </div>
+        <div class="preview">
+          <p>"You're late," whispered the dragon, scales the colour of warm tea. Mira climbed up beside him with a story tucked under her arm…</p>
+          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
+        </div>
+      </a>
+
+      <!-- Cover 2 -->
+      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#9CAF88 0%, #6F8868 100%);">
+        <div class="spine"></div>
+        <div class="absolute inset-0 p-5">
+          <p class="small-caps text-cream/90 text-[10px]">A Hush original</p>
+          <svg class="absolute top-14 left-1/2 -translate-x-1/2 w-2/3 h-32 text-cream" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 100 Q 50 20 100 80 T 190 60" stroke-dasharray="3 5" opacity="0.7"/>
+            <path d="M150 30 L 170 30 L 170 60 Q 178 64 178 72 L 178 86 Q 178 96 168 96 L 152 96 Q 142 96 142 86 L 142 70 Q 150 66 150 60 Z" fill="#FFF8F1" stroke="#2D2A26" stroke-width="1.4"/>
+            <line x1="150" y1="40" x2="170" y2="40" stroke="#D97757" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(0,0,0,0.4));">
+          <p class="font-serif text-cream text-[20px] leading-tight tracking-tightish">Leo's Lost Sock<br/>Adventure</p>
+          <p class="mt-1 font-serif italic text-cream/80 text-[12px]">starring Leo, age 6</p>
+        </div>
+        <div class="preview">
+          <p>The left sock was definitely under the couch. Probably. Leo had a flashlight, a map, and one very curious cat named Pickle…</p>
+          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
+        </div>
+      </a>
+
+      <!-- Cover 3 -->
+      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#F0E9DD 0%, #E6DCCB 100%);">
+        <div class="spine"></div>
+        <div class="absolute inset-0 p-5 text-ink">
+          <p class="small-caps text-coral text-[10px]">A Hush original</p>
+          <div class="absolute top-12 left-1/2 -translate-x-1/2 w-28 h-28 rounded-full" style="background: radial-gradient(circle at 35% 35%, #FFF8F1, #F4D9A9 70%, #D9B574); box-shadow: inset -8px -10px 0 rgba(45,42,38,0.06);"></div>
+          <div class="absolute top-20 left-1/2 -translate-x-12 w-1.5 h-1.5 rounded-full bg-ink/40"></div>
+          <div class="absolute top-24 left-1/2 translate-x-2 w-1 h-1 rounded-full bg-ink/30"></div>
+          <div class="absolute top-32 left-1/2 -translate-x-2 w-1 h-1 rounded-full bg-ink/30"></div>
+          <div class="absolute bottom-24 left-4 right-4 h-3 rounded-sm bg-coral/70"></div>
+        </div>
+        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(45,42,38,0.10));">
+          <p class="font-serif text-ink text-[20px] leading-tight tracking-tightish">Aria Visits the<br/>Moon Bakery</p>
+          <p class="mt-1 font-serif italic text-ink2 text-[12px]">starring Aria, age 5</p>
+        </div>
+        <div class="preview">
+          <p>The bakery smelled of warm clouds and butter. The baker — a very tall rabbit — handed Aria a glowing bun and winked…</p>
+          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
+        </div>
+      </a>
+
+      <!-- Cover 4 -->
+      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#D97757 0%, #C25E3F 100%);">
+        <div class="spine"></div>
+        <div class="absolute inset-0 p-5">
+          <p class="small-caps text-cream/95 text-[10px]">A Hush original</p>
+          <svg class="absolute top-12 left-6 w-20 h-20 text-cream" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 40 L 18 22 L 26 28 L 34 22 L 42 40 Z"/>
+            <circle cx="22" cy="34" r="1.2" fill="currentColor"/>
+            <circle cx="32" cy="34" r="1.2" fill="currentColor"/>
+            <path d="M24 38 q 3 2 6 0"/>
+            <path d="M42 40 q 6 -4 8 -10"/>
+          </svg>
+          <svg class="absolute top-20 right-4 w-16 h-16 text-cream/90" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 40 L 18 22 L 26 28 L 34 22 L 42 40 Z"/>
+            <circle cx="22" cy="34" r="1.2" fill="currentColor"/>
+            <circle cx="32" cy="34" r="1.2" fill="currentColor"/>
+            <path d="M24 38 q 3 2 6 0"/>
+          </svg>
+        </div>
+        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(0,0,0,0.45));">
+          <p class="font-serif text-cream text-[20px] leading-tight tracking-tightish">How Finn Made<br/>a New Friend</p>
+          <p class="mt-1 font-serif italic text-cream/80 text-[12px]">starring Finn, age 3</p>
+        </div>
+        <div class="preview">
+          <p>The new fox at the den was very, very quiet. Finn took a deep breath and offered the only thing she had — half of a very good acorn…</p>
+          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
+        </div>
+      </a>
+
+      <div class="shrink-0 w-2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="bg-cream2 py-24 md:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="max-w-2xl mb-14">
+      <p class="small-caps text-sageDk mb-4">Parents talking</p>
+      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
+        Bedtime, but the good kind.
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+      <figure class="bg-cream rounded-card p-8 shadow-soft flex flex-col">
+        <svg class="w-7 h-7 text-coral mb-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4H8c0 2 1 4 3 5v2c-3-1-5-4-5-7V7zm9 0h4v4h-3c0 2 1 4 3 5v2c-3-1-5-4-5-7V7z"/></svg>
+        <blockquote class="font-serif text-[19px] leading-[1.5] text-ink">
+          "My daughter asks for 'her book' every single night now. She's 4 and she thinks Hush wrote it just for her. Honestly, it did."
+        </blockquote>
+        <figcaption class="mt-6 pt-6 border-t border-ink/10 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-coral/20 text-coral flex items-center justify-center font-serif">S</div>
+          <div>
+            <p class="font-medium text-ink text-[14.5px]">Sarah K.</p>
+            <p class="text-ink3 text-[13px]">Mom of two · Brooklyn</p>
+          </div>
+        </figcaption>
+      </figure>
+
+      <figure class="bg-cream rounded-card p-8 shadow-soft flex flex-col">
+        <svg class="w-7 h-7 text-coral mb-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4H8c0 2 1 4 3 5v2c-3-1-5-4-5-7V7zm9 0h4v4h-3c0 2 1 4 3 5v2c-3-1-5-4-5-7V7z"/></svg>
+        <blockquote class="font-serif text-[19px] leading-[1.5] text-ink">
+          "I was skeptical about AI writing for kids. Then I read one to my son. The illustrations are beautiful and the story had a real lesson about sharing. We're hooked."
+        </blockquote>
+        <figcaption class="mt-6 pt-6 border-t border-ink/10 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-sage/30 text-sageDk flex items-center justify-center font-serif">M</div>
+          <div>
+            <p class="font-medium text-ink text-[14.5px]">Marcus T.</p>
+            <p class="text-ink3 text-[13px]">Dad of one · Austin</p>
+          </div>
+        </figcaption>
+      </figure>
+
+      <figure class="bg-cream rounded-card p-8 shadow-soft flex flex-col">
+        <svg class="w-7 h-7 text-coral mb-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4H8c0 2 1 4 3 5v2c-3-1-5-4-5-7V7zm9 0h4v4h-3c0 2 1 4 3 5v2c-3-1-5-4-5-7V7z"/></svg>
+        <blockquote class="font-serif text-[19px] leading-[1.5] text-ink">
+          "Best $9 I spend each month. We have 47 personalized books in our library. Bedtime is the highlight of our day again."
+        </blockquote>
+        <figcaption class="mt-6 pt-6 border-t border-ink/10 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-coral/20 text-coral flex items-center justify-center font-serif">P</div>
+          <div>
+            <p class="font-medium text-ink text-[14.5px]">Priya S.</p>
+            <p class="text-ink3 text-[13px]">Mom of three · Toronto</p>
+          </div>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-24 md:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="max-w-2xl mb-14">
+      <p class="small-caps text-sageDk mb-4">Pricing</p>
+      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
+        Simple. Two plans. Cancel anytime.
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 max-w-4xl">
+      <!-- Free -->
+      <div class="bg-cream rounded-card p-8 md:p-10 shadow-soft border border-ink/[0.06]">
+        <div class="flex items-baseline justify-between">
+          <h3 class="font-serif text-[28px] tracking-tightish">Free</h3>
+          <span class="small-caps text-ink3">Forever</span>
+        </div>
+        <p class="mt-2 text-ink2">For trying it out before bedtime tonight.</p>
+        <p class="mt-7 font-serif text-[48px] leading-none tracking-tighter2">$0<span class="text-[18px] text-ink3 font-sans font-normal"> /month</span></p>
+
+        <ul class="mt-8 space-y-3 text-[15px] text-ink">
+          <li class="flex gap-3"><span class="mt-1 text-sageDk">✓</span>3 stories per month</li>
+          <li class="flex gap-3"><span class="mt-1 text-sageDk">✓</span>Standard illustrations</li>
+          <li class="flex gap-3"><span class="mt-1 text-sageDk">✓</span>Read on screen</li>
+          <li class="flex gap-3 text-ink3"><span class="mt-1">—</span>Audio narration</li>
+          <li class="flex gap-3 text-ink3"><span class="mt-1">—</span>Print and PDF export</li>
+        </ul>
+
+        <a href="#cta" class="mt-9 btn w-full justify-center bg-cream2 text-ink hover:bg-cream3 text-[15px] py-3.5">Start free</a>
+      </div>
+
+      <!-- Family -->
+      <div class="relative bg-cream rounded-card p-8 md:p-10 shadow-soft2 border-2 border-coral">
+        <span class="absolute -top-3 left-8 bg-coral text-cream small-caps text-[11px] px-3 py-1 rounded-full">Most loved</span>
+        <div class="flex items-baseline justify-between">
+          <h3 class="font-serif text-[28px] tracking-tightish">Family</h3>
+          <span class="small-caps text-coral">7-day free trial</span>
+        </div>
+        <p class="mt-2 text-ink2">For nightly readers and growing libraries.</p>
+        <p class="mt-7 font-serif text-[48px] leading-none tracking-tighter2">$9<span class="text-[18px] text-ink3 font-sans font-normal"> /month</span></p>
+
+        <ul class="mt-8 space-y-3 text-[15px] text-ink">
+          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Unlimited stories</li>
+          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Premium illustration styles</li>
+          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Audio narration</li>
+          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Print and PDF export</li>
+          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Multiple child profiles</li>
+        </ul>
+
+        <a href="#cta" class="mt-9 btn btn-coral w-full justify-center text-[15px] py-3.5">Try Family free for 7 days</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="bg-cream2 py-24 md:py-32">
+  <div class="max-w-4xl mx-auto px-6 lg:px-10">
+    <div class="mb-12">
+      <p class="small-caps text-sageDk mb-4">Frequently asked</p>
+      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
+        The questions parents ask first.
+      </h2>
+    </div>
+
+    <div>
+      <details class="faq" open>
+        <summary>
+          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Is Hush safe for my child?</span>
+          <span class="plus" aria-hidden="true">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </summary>
+        <p class="answer">Every prompt is filtered, every theme age-appropriate. Stories are reviewed against a parent-built guidelines library before reaching your screen.</p>
+      </details>
+
+      <details class="faq">
+        <summary>
+          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">How does the AI actually work?</span>
+          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </summary>
+        <p class="answer">Hush uses a fine-tuned story model and an illustration model trained on classic children's book aesthetics. You give the spark, we write the book.</p>
+      </details>
+
+      <details class="faq">
+        <summary>
+          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">What ages is Hush for?</span>
+          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </summary>
+        <p class="answer">Kids ages 2 through 9. The story length, vocabulary, and themes scale with the age you set.</p>
+      </details>
+
+      <details class="faq">
+        <summary>
+          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Can I edit a story after it's generated?</span>
+          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </summary>
+        <p class="answer">Yes. Tap any line to rewrite it, swap illustrations, or regenerate the whole story.</p>
+      </details>
+
+      <details class="faq">
+        <summary>
+          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Is my child's data private?</span>
+          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </summary>
+        <p class="answer">Always. We never sell data, never train on your stories, and you can delete everything in one click.</p>
+      </details>
+
+      <details class="faq">
+        <summary>
+          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Can I cancel anytime?</span>
+          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        </summary>
+        <p class="answer">Yes, no contracts, no questions. Your library stays yours.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="cta" class="bg-coral relative overflow-hidden">
+  <svg class="absolute top-10 right-12 w-6 h-6 text-cream/40 twinkle" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+  <svg class="absolute bottom-12 left-16 w-5 h-5 text-cream/30 twinkle delay-1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
+  <svg class="absolute top-1/3 left-[8%] w-12 h-12 text-cream/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-24 md:py-32 text-center relative">
+    <h2 class="font-serif text-cream text-[44px] md:text-[64px] leading-[1.04] tracking-tighter2 max-w-3xl mx-auto">
+      Tonight's story <span class="italic">is waiting.</span>
+    </h2>
+    <p class="mt-6 text-cream/85 text-[17px] md:text-[19px] max-w-xl mx-auto">
+      Make their first one in under a minute. Free, no credit card.
+    </p>
+    <div class="mt-9">
+      <a href="#" class="btn btn-cream text-[16px]">
+        Create your first story free
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <p class="mt-6 text-cream/70 text-[13.5px]">3 free stories every month. Forever.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-cream pt-20 pb-10">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-4">
+        <div class="flex items-center gap-2">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-coral" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+          <span class="font-serif text-[24px] tracking-tightish">Hush</span>
+        </div>
+        <p class="mt-3 font-serif italic text-ink2 max-w-[36ch]">A new bedtime story every night. Starring your child.</p>
+        <p class="mt-6 text-[13.5px] text-ink3">hush.kids</p>
+      </div>
+
+      <div class="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+        <div>
+          <p class="small-caps text-ink3 mb-4">Product</p>
+          <ul class="space-y-2.5 text-[14.5px] text-ink2">
+            <li><a class="hover:text-ink ulink" href="#how">How it works</a></li>
+            <li><a class="hover:text-ink ulink" href="#examples">Examples</a></li>
+            <li><a class="hover:text-ink ulink" href="#pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="small-caps text-ink3 mb-4">Company</p>
+          <ul class="space-y-2.5 text-[14.5px] text-ink2">
+            <li><a class="hover:text-ink ulink" href="#">About</a></li>
+            <li><a class="hover:text-ink ulink" href="#">Blog</a></li>
+            <li><a class="hover:text-ink ulink" href="#">Press</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="small-caps text-ink3 mb-4">Support</p>
+          <ul class="space-y-2.5 text-[14.5px] text-ink2">
+            <li><a class="hover:text-ink ulink" href="#">Help</a></li>
+            <li><a class="hover:text-ink ulink" href="#">Contact</a></li>
+            <li><a class="hover:text-ink ulink" href="#">Status</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="small-caps text-ink3 mb-4">Legal</p>
+          <ul class="space-y-2.5 text-[14.5px] text-ink2">
+            <li><a class="hover:text-ink ulink" href="#">Privacy</a></li>
+            <li><a class="hover:text-ink ulink" href="#">Terms</a></li>
+            <li><a class="hover:text-ink ulink" href="#">Child safety</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-16 pt-8 border-t border-ink/[0.08] flex flex-wrap gap-3 items-center justify-between text-[13px] text-ink3">
+      <p>© 2026 Hush. Made with care by parents in Toronto.</p>
+      <p class="font-serif italic">Sweet dreams.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Sticky nav
+  const nav = document.getElementById('nav');
+  const setNav = () => {
+    if (window.scrollY > 12) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  };
+  setNav();
+  window.addEventListener('scroll', setNav, { passive: true });
+
+  // FAQ single-open accordion
+  document.querySelectorAll('details.faq').forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if (d.open) {
+        document.querySelectorAll('details.faq').forEach((o) => { if (o !== d) o.open = false; });
+      }
+    });
+  });
+</script>
+</body>
+</html>
