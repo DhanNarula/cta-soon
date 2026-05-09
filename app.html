@@ -87,7 +87,8 @@ select option{background:var(--grove)}
 .creator-btns{display:flex;gap:10px;align-items:center}
 
 /* ── GENERATING ── */
-#view-generating{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:40px 20px;text-align:center}
+#view-generating{min-height:calc(100vh - 60px);padding:40px 20px;text-align:center}
+#view-generating.active{display:flex;align-items:center;justify-content:center}
 .gen-inner{max-width:420px}
 .gen-inner h2{font-family:'Lora',serif;font-size:28px;margin:20px 0 8px;letter-spacing:-.02em}
 .gen-inner p{color:var(--muted);font-size:15px;margin-bottom:32px}
@@ -98,7 +99,8 @@ select option{background:var(--grove)}
 .gen-steps-text{font-size:13px;color:var(--muted);height:20px}
 
 /* ── READER ── */
-#view-reader{display:flex;flex-direction:column;height:calc(100vh - 60px);overflow:hidden}
+#view-reader{height:calc(100vh - 60px);overflow:hidden}
+#view-reader.active{display:flex;flex-direction:column}
 .reader-top{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
 .reader-title{font-family:'Lora',serif;font-size:16px;font-weight:600;letter-spacing:-.01em;flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .reader-pages{font-size:13px;color:var(--muted);white-space:nowrap}
@@ -233,18 +235,18 @@ select option{background:var(--grove)}
       <h2>What does <span id="s2name">your child</span> love?</h2>
       <p class="sub">Pick 1–3 things. They'll show up in the story.</p>
       <div class="pill-row" id="interest-pills">
-        <button class="pill" onclick="togglePill(this,'interest')">🦕 Dinosaurs</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🚀 Space</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🧙 Magic</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🦊 Animals</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🌊 Ocean</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🏰 Castles</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🌿 Nature</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🎵 Music</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🤖 Robots</button>
-        <button class="pill" onclick="togglePill(this,'interest')">⚽ Sports</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🍕 Food</button>
-        <button class="pill" onclick="togglePill(this,'interest')">🌈 Colours</button>
+        <button class="pill" onclick="togglePill(this)">🦕 Dinosaurs</button>
+        <button class="pill" onclick="togglePill(this)">🚀 Space</button>
+        <button class="pill" onclick="togglePill(this)">🧙 Magic</button>
+        <button class="pill" onclick="togglePill(this)">🦊 Animals</button>
+        <button class="pill" onclick="togglePill(this)">🌊 Ocean</button>
+        <button class="pill" onclick="togglePill(this)">🏰 Castles</button>
+        <button class="pill" onclick="togglePill(this)">🌿 Nature</button>
+        <button class="pill" onclick="togglePill(this)">🎵 Music</button>
+        <button class="pill" onclick="togglePill(this)">🤖 Robots</button>
+        <button class="pill" onclick="togglePill(this)">⚽ Sports</button>
+        <button class="pill" onclick="togglePill(this)">🍕 Food</button>
+        <button class="pill" onclick="togglePill(this)">🌈 Colours</button>
       </div>
       <div class="creator-btns">
         <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
@@ -446,17 +448,30 @@ function makeSVG(bgType, phase, accent) {
     ${Array.from({length:10},(_,i)=>`<ellipse cx="${50+(i*43)%380}" cy="${215+(i*17)%120}" rx="${2+i%4}" ry="${1+i%3}" fill="none" stroke="${a}" stroke-width="1" opacity=".15"/>`).join('')}
   </svg>`;
 
-  if (bgType === 'city') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#111111"/><stop offset="100%" stop-color="#0a0a0a"/></linearGradient></defs>
-    <rect width="480" height="360" fill="url(#cg)"/>
-    ${stars}${moon}
-    ${[40,90,150,200,260,310,370,420].map((x,i)=>`<rect x="${x}" y="${100+i%4*30}" width="${30+i%3*10}" height="${200-i%4*20}" fill="#1a1a1a"/>${Array.from({length:4},(_,j)=>`<rect x="${x+4+j%2*12}" y="${110+i%4*30+j*18}" width="8" height="10" fill="${a}" opacity="${Math.random()>.5?.6:.15}"/>`).join('')}`).join('')}
-    <path d="M0 295 L480 295 L480 360 L0 360Z" fill="#111"/>
-    <circle cx="220" cy="280" r="8" fill="#67e8f9" opacity=".9"/>
-    <rect x="215" y="288" width="10" height="14" rx="2" fill="#67e8f9" opacity=".8"/>
-    <rect x="218" y="284" width="2" height="5" fill="${a}" opacity=".9"/>
-    ${Array.from({length:6},(_,i)=>`<circle cx="${60+i*70}" cy="295" r="3" fill="${a}" opacity=".4"/>`).join('')}
-  </svg>`;
+  if (bgType === 'city') {
+    const buildingXs = [40,90,150,200,260,310,370,420];
+    const buildings = buildingXs.map(function(x, i) {
+      const w = 30 + i%3*10, h = 200 - i%4*20, y = 100 + i%4*30;
+      const windows = [0,1,2,3].map(function(j) {
+        const wx = x + 4 + j%2*12, wy = 110 + i%4*30 + j*18;
+        const op = (i+j)%2 === 0 ? '.6' : '.15';
+        return '<rect x="' + wx + '" y="' + wy + '" width="8" height="10" fill="' + a + '" opacity="' + op + '"/>';
+      }).join('');
+      return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#1a1a1a"/>' + windows;
+    }).join('');
+    const streetDots = [0,1,2,3,4,5].map(function(i){ return '<circle cx="' + (60+i*70) + '" cy="295" r="3" fill="' + a + '" opacity=".4"/>'; }).join('');
+    return '<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#111111"/><stop offset="100%" stop-color="#0a0a0a"/></linearGradient></defs>'
+      + '<rect width="480" height="360" fill="url(#cg)"/>'
+      + stars + moon
+      + buildings
+      + '<path d="M0 295 L480 295 L480 360 L0 360Z" fill="#111"/>'
+      + '<circle cx="220" cy="280" r="8" fill="#67e8f9" opacity=".9"/>'
+      + '<rect x="215" y="288" width="10" height="14" rx="2" fill="#67e8f9" opacity=".8"/>'
+      + '<rect x="218" y="284" width="2" height="5" fill="' + a + '" opacity=".9"/>'
+      + streetDots
+      + '</svg>';
+  }
 
   if (bgType === 'kitchen') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
     <rect width="480" height="360" fill="#1a0f0a"/>
@@ -600,8 +615,20 @@ function showView(name) {
 // ─────────────────────────────────────────────
 function goStep(n) {
   if (n === 2) {
-    const name = document.getElementById('c-name').value.trim();
-    if (!name) { document.getElementById('c-name').focus(); return; }
+    const nameEl = document.getElementById('c-name');
+    const name = nameEl.value.trim();
+    if (!name) {
+      nameEl.style.borderColor = '#ef4444';
+      nameEl.style.boxShadow = '0 0 0 3px rgba(239,68,68,.2)';
+      nameEl.placeholder = 'Please enter a name first!';
+      nameEl.focus();
+      setTimeout(() => {
+        nameEl.style.borderColor = '';
+        nameEl.style.boxShadow = '';
+        nameEl.placeholder = 'e.g. Mira, Leo, Aria…';
+      }, 2000);
+      return;
+    }
     document.getElementById('s2name').textContent = name;
     const cbname = document.getElementById('create-btn-name');
     if (cbname) cbname.textContent = name + "'s";
@@ -617,15 +644,18 @@ function goStep(n) {
 }
 
 function pickOne(btn, group) {
-  btn.closest('.pill-row, .theme-row, .creator-inner').querySelectorAll('.'+( group==='age'?'pill':'theme-item')).forEach(b=>b.classList.remove('on'));
+  const container = btn.closest('.pill-row') || btn.closest('.theme-row') || btn.closest('.creator-inner');
+  if (container) container.querySelectorAll('.' + (group === 'age' ? 'pill' : 'theme-item')).forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
+  // strip leading emoji + space so lookup keys match
+  const rawText = btn.textContent.trim().replace(/^[\p{Emoji}\s]+\s/u, '').trim();
   if (group === 'age') selectedAge = btn.textContent.trim();
-  if (group === 'theme') selectedTheme = btn.textContent.trim();
+  if (group === 'theme') selectedTheme = rawText;
 }
 
-function togglePill(btn, group) {
+function togglePill(btn) {
   btn.classList.toggle('on');
-  const val = btn.textContent.trim().replace(/^\S+\s/,'');
+  const val = btn.textContent.trim().replace(/^[\p{Emoji}\s]+\s/u, '').trim();
   if (btn.classList.contains('on')) selectedInterests.add(val);
   else selectedInterests.delete(val);
 }
@@ -959,9 +989,19 @@ document.addEventListener('keydown', e => {
   const params = new URLSearchParams(location.search);
   const name = params.get('name');
   const startCreate = params.get('create');
+  const paramAge = params.get('age');
+  const paramInterests = params.get('interests');
+  const paramTheme = params.get('theme');
 
-  if (startCreate !== null || name) {
-    if (name) document.getElementById('c-name').value = name;
+  if (paramAge) selectedAge = paramAge;
+  if (paramInterests) paramInterests.split(',').forEach(i => { const t = i.trim(); if (t) selectedInterests.add(t); });
+  if (paramTheme) selectedTheme = paramTheme;
+  if (name) document.getElementById('c-name').value = name;
+
+  // If the landing page sent all params, skip the wizard and generate immediately
+  if (startCreate !== null && name && paramAge && paramTheme) {
+    createStory();
+  } else if (startCreate !== null || name) {
     showView('creator');
   } else {
     renderLibrary();

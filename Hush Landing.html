@@ -676,10 +676,13 @@ window.addEventListener('scroll', () => {
 function heroGo() { openModal(document.getElementById('hero-name').value.trim()); }
 function ctaGo()  { openModal(document.getElementById('cta-name').value.trim()); }
 
-// --- modal → redirect to real app ---
+// --- modal ---
 function openModal(name) {
-  const url = 'app.html?create=1' + (name ? '&name=' + encodeURIComponent(name) : '');
-  window.location.href = url;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  step(1);
+  const nameEl = document.getElementById('mname');
+  if (name) { nameEl.value = name; step(2); } else { nameEl.value = ''; }
 }
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
@@ -709,13 +712,27 @@ function pickTheme(btn) {
 }
 
 function generate() {
+  const name = document.getElementById('mname').value.trim();
+  if (!name) { step(1); return; }
+
+  const ageBtn = document.querySelector('.age-btn.on');
+  const age = ageBtn ? ageBtn.textContent.trim() : '4–5';
+  const stripEmoji = t => t.trim().replace(/^[\p{Emoji}\s]+\s/u, '').trim();
+  const interests = [...document.querySelectorAll('.tag-btn.on')].map(b => stripEmoji(b.textContent)).join(',');
+  const themeBtn = document.querySelector('.theme-btn.on');
+  const theme = themeBtn ? stripEmoji(themeBtn.textContent) : 'Being brave';
+
   const btn = document.getElementById('genbtn');
   btn.textContent = '✦ Writing story…';
-  btn.disabled = true; btn.style.opacity = '.7';
-  setTimeout(() => {
-    btn.innerHTML = '🎉 Story ready! Sign up to read it →';
-    btn.disabled = false; btn.style.opacity = '1';
-  }, 2200);
+  btn.disabled = true;
+
+  let url = 'app.html?create=1'
+    + '&name=' + encodeURIComponent(name)
+    + '&age=' + encodeURIComponent(age)
+    + (interests ? '&interests=' + encodeURIComponent(interests) : '')
+    + '&theme=' + encodeURIComponent(theme);
+
+  setTimeout(() => { window.location.href = url; }, 600);
 }
 
 // --- faq single-open ---
