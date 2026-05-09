@@ -1,592 +1,442 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hush — A new bedtime story every night. Starring your child.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          serif: ['Newsreader', 'Source Serif Pro', 'ui-serif', 'Georgia', 'serif'],
-          sans:  ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        },
-        colors: {
-          cream:    '#FAF6F0',
-          cream2:   '#F0E9DD',
-          cream3:   '#E6DCCB',
-          coral:    '#D97757',
-          coralDk:  '#C25E3F',
-          sage:     '#9CAF88',
-          sageDk:   '#6F8868',
-          ink:      '#2D2A26',
-          ink2:     '#5C5750',
-          ink3:     '#8A847A',
-        },
-        borderRadius: { card: '16px', btn: '12px' },
-        boxShadow: {
-          soft:  '0 4px 24px rgba(0,0,0,0.04)',
-          soft2: '0 8px 40px rgba(0,0,0,0.06)',
-          lift:  '0 18px 60px -20px rgba(45,42,38,0.25)',
-        },
-        letterSpacing: { tightish: '-0.018em', tighter2: '-0.03em' },
-      },
-    },
-  };
-</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Hush — A personalized bedtime story every night</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Inter', sans-serif; color: #2D2A26; background: #FAF6F0; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-  .font-serif { font-feature-settings: "ss01","liga"; }
+:root {
+  --forest:  #0D1F16;
+  --grove:   #122A1D;
+  --canopy:  #1A3A28;
+  --leaf:    #2A5040;
+  --gold:    #D4A853;
+  --goldlt:  #E8C47A;
+  --green:   #4ADE80;
+  --cream:   #F5EFE0;
+  --muted:   #9DB8A8;
+  --faint:   rgba(212,168,83,0.10);
+  --border:  rgba(212,168,83,0.18);
+  --r:       14px;
+  --rsm:     8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--forest);color:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
 
-  /* Paper grain — layered noise + warm wash */
-  .paper-grain { position: relative; }
-  .paper-grain::before {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background-image:
-      radial-gradient(1200px 600px at 85% 0%, rgba(217,119,87,0.06), transparent 60%),
-      radial-gradient(900px 500px at 0% 30%, rgba(156,175,136,0.05), transparent 60%),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0 0.14  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size: auto, auto, 220px 220px;
-    mix-blend-mode: multiply; opacity: 0.85;
-  }
+/* ---- typography helpers ---- */
+.serif{font-family:'Lora',Georgia,serif}
+.label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 
-  /* subtle striped placeholder for image slots */
-  .stripes-cream {
-    background-image: repeating-linear-gradient(135deg, #EFE6D5 0 12px, #E8DDC7 12px 24px);
-  }
-  .stripes-coral {
-    background-image: repeating-linear-gradient(135deg, rgba(217,119,87,0.18) 0 10px, rgba(217,119,87,0.10) 10px 20px), linear-gradient(#FAF6F0,#FAF6F0);
-  }
-  .stripes-sage {
-    background-image: repeating-linear-gradient(135deg, rgba(156,175,136,0.22) 0 10px, rgba(156,175,136,0.12) 10px 20px), linear-gradient(#FAF6F0,#FAF6F0);
-  }
-  .stripes-ink {
-    background-image: repeating-linear-gradient(135deg, rgba(45,42,38,0.12) 0 10px, rgba(45,42,38,0.06) 10px 20px), linear-gradient(#FAF6F0,#FAF6F0);
-  }
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;gap:.45rem;font-family:inherit;font-weight:700;font-size:15px;border-radius:10px;border:none;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,opacity .18s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:var(--forest);padding:14px 22px;box-shadow:0 4px 20px rgba(212,168,83,.35)}
+.btn-gold:hover{background:var(--goldlt);box-shadow:0 8px 28px rgba(212,168,83,.5)}
+.btn-outline{background:transparent;color:var(--cream);border:1.5px solid var(--border);padding:12px 20px}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-ghost{background:transparent;color:var(--muted);padding:12px 0;font-size:14px}
+.btn-ghost:hover{color:var(--cream)}
 
-  .small-caps { letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; font-size: 12px; }
+/* ---- inputs ---- */
+input,select{font-family:inherit;font-size:16px;background:var(--canopy);color:var(--cream);border:1.5px solid var(--border);border-radius:var(--rsm);padding:14px 16px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:var(--muted)}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.15)}
 
-  /* Buttons */
-  .btn { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 12px; font-weight: 600; transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease; }
-  .btn:hover { transform: translateY(-1px) scale(1.02); }
-  .btn-coral { background: #D97757; color: #FFF8F1; padding: 0.85rem 1.25rem; box-shadow: 0 6px 18px -6px rgba(217,119,87,0.5); }
-  .btn-coral:hover { background: #C25E3F; box-shadow: 0 10px 26px -6px rgba(217,119,87,0.55); }
-  .btn-cream { background: #FFF8F1; color: #C25E3F; padding: 0.95rem 1.4rem; box-shadow: 0 6px 18px -6px rgba(0,0,0,0.18); }
-  .btn-ghost { color: #2D2A26; padding: 0.85rem 0.6rem; }
-  .btn-ghost:hover { color: #C25E3F; }
+/* ---- nav ---- */
+#nav{position:fixed;top:0;inset-x:0;z-index:100;height:64px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid transparent;transition:background .25s,backdrop-filter .25s,border-color .25s}
+#nav.scrolled{background:rgba(13,31,22,.92);backdrop-filter:saturate(160%) blur(12px);border-color:var(--border)}
+.nav-inner{width:100%;max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-logo{display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{color:var(--muted);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--cream)}
 
-  /* Nav scroll state */
-  #nav { transition: background-color .25s ease, box-shadow .25s ease, border-color .25s ease, backdrop-filter .25s ease; }
-  #nav.scrolled { background: rgba(250,246,240,0.82); backdrop-filter: saturate(140%) blur(10px); border-color: rgba(45,42,38,0.06); box-shadow: 0 1px 0 rgba(45,42,38,0.04); }
+/* hamburger */
+.hbg{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hbg span{display:block;width:22px;height:2px;background:var(--cream);border-radius:2px;transition:transform .25s,opacity .25s}
+.hbg.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hbg.open span:nth-child(2){opacity:0}
+.hbg.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
-  /* Storybook spread */
-  .book {
-    position: relative; width: 100%; aspect-ratio: 1.35 / 1;
-    background: linear-gradient(180deg,#FFF8EC 0%, #F4E7CF 100%);
-    border-radius: 10px;
-    box-shadow: 0 30px 60px -30px rgba(45,42,38,0.45), 0 12px 30px -10px rgba(45,42,38,0.18);
-  }
-  .book::before {
-    content: ""; position: absolute; left: 50%; top: 4%; bottom: 4%; width: 28px; transform: translateX(-50%);
-    background: radial-gradient(closest-side, rgba(0,0,0,0.18), transparent 70%);
-    filter: blur(2px);
-  }
-  .book::after {
-    content: ""; position: absolute; left: 1.5%; right: 1.5%; bottom: -6px; height: 10px;
-    background: linear-gradient(180deg, #EAD9B6, #C9B58A);
-    border-radius: 0 0 4px 4px; opacity: 0.7;
-  }
-  .page { position: absolute; top: 5%; bottom: 5%; width: 47.5%; padding: 6%; }
-  .page.left  { left: 2.5%; }
-  .page.right { right: 2.5%; }
+/* mobile nav overlay */
+#mnav{display:none;position:fixed;inset:0;z-index:99;background:var(--forest);flex-direction:column;align-items:center;justify-content:center;gap:28px;padding-top:64px}
+#mnav.open{display:flex}
+#mnav a{font-size:28px;font-weight:700;color:var(--cream);transition:color .2s}
+#mnav a:hover{color:var(--gold)}
 
-  /* Book cover styles */
-  .cover {
-    position: relative; aspect-ratio: 0.7 / 1; border-radius: 6px;
-    box-shadow: 0 18px 36px -16px rgba(45,42,38,0.45), 0 6px 14px -6px rgba(45,42,38,0.2);
-    overflow: hidden; transform-origin: bottom center;
-    transition: transform .35s ease, box-shadow .35s ease;
-  }
-  .cover:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 0 28px 50px -18px rgba(45,42,38,0.55); }
-  .cover .spine { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: rgba(0,0,0,0.18); }
-  .cover .title-area { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 14px 16px 14px; }
+/* ---- layout ---- */
+.container{max-width:1200px;margin:0 auto}
+.container-md{max-width:860px;margin:0 auto}
+.sec{padding:80px 24px}
+@media(min-width:768px){.sec{padding:112px 40px}}
+.alt{background:var(--grove)}
+.text-center{text-align:center}
 
-  /* Hover preview */
-  .preview {
-    position: absolute; inset: 0; opacity: 0; transition: opacity .25s ease;
-    background: rgba(45,42,38,0.86); color: #FAF6F0;
-    display: flex; flex-direction: column; justify-content: flex-end; padding: 14px;
-    font-family: 'Newsreader', serif; font-style: italic; line-height: 1.5; font-size: 13px;
-    border-radius: 6px;
-  }
-  .cover:hover .preview { opacity: 1; }
+/* section heading */
+.sh{max-width:580px}
+.sh h2{font-family:'Lora',serif;font-size:clamp(28px,4.5vw,48px);line-height:1.1;letter-spacing:-.02em;margin:10px 0 14px}
+.sh p{color:var(--muted);font-size:17px;line-height:1.6;max-width:50ch}
 
-  /* FAQ */
-  details.faq { border-top: 1px solid rgba(45,42,38,0.10); }
-  details.faq:last-of-type { border-bottom: 1px solid rgba(45,42,38,0.10); }
-  details.faq summary { list-style: none; cursor: pointer; padding: 1.4rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-  details.faq summary::-webkit-details-marker { display: none; }
-  details.faq .plus { width: 28px; height: 28px; border-radius: 999px; border: 1px solid rgba(45,42,38,0.18); display: inline-flex; align-items: center; justify-content: center; transition: transform .25s ease, background-color .2s ease, color .2s ease; flex: 0 0 auto; }
-  details.faq[open] .plus { transform: rotate(45deg); background: #D97757; color: #FFF8F1; border-color: #D97757; }
-  details.faq .answer { padding: 0 0 1.6rem 0; max-width: 62ch; color: #5C5750; }
+/* ---- HERO ---- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:96px 24px 64px;position:relative;overflow:hidden;text-align:center}
+#starfield{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:var(--gold);animation:twinkle 4s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.65;transform:scale(1)}}
+.hero h1{font-family:'Lora',serif;font-size:clamp(38px,7.5vw,84px);line-height:1.04;letter-spacing:-.025em;margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--muted);max-width:52ch;margin:0 auto}
+.hero-form{display:flex;flex-direction:column;gap:10px;max-width:460px;margin:32px auto 0}
+@media(min-width:520px){.hero-form{flex-direction:row}.hero-form input{flex:1}.hero-form .btn{flex-shrink:0}}
+.hero-nudge{margin-top:16px;font-size:13px;color:var(--muted)}
+.trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;margin-top:44px;padding-top:28px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+.trust-row strong{color:var(--cream);font-weight:700}
+.divider{color:var(--border)}
 
-  /* Underline link */
-  .ulink { position: relative; }
-  .ulink::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: currentColor; opacity: 0.5; transition: opacity .2s ease; }
-  .ulink:hover::after { opacity: 1; }
+/* ---- PRESS ---- */
+.press-bar{padding:28px 24px;background:var(--grove);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.press-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px 36px;margin-top:14px;opacity:.5}
+.press-logo{font-size:15px;font-weight:700;letter-spacing:-.01em}
 
-  /* card hover lift */
-  .feat:hover { transform: translateY(-3px); box-shadow: 0 12px 36px -16px rgba(45,42,38,0.18); }
-  .feat { transition: transform .25s ease, box-shadow .25s ease; }
+/* ---- STEPS ---- */
+.step-grid{display:grid;grid-template-columns:1fr;gap:20px;margin-top:52px}
+@media(min-width:680px){.step-grid{grid-template-columns:repeat(3,1fr)}}
+.step-card{background:var(--grove);border:1px solid var(--border);border-radius:var(--r);padding:28px}
+.step-num{font-family:'Lora',serif;font-style:italic;font-size:38px;color:var(--gold);opacity:.35;line-height:1;margin-bottom:10px}
+.step-card h3{font-size:19px;font-weight:700;margin-bottom:8px}
+.step-card p{color:var(--muted);font-size:15px;line-height:1.6}
 
-  /* tilted hero book wrapper */
-  .tilt { transform: rotate(4deg); }
-  @media (max-width: 768px) { .tilt { transform: rotate(2deg); } }
+/* ---- FEATURES ---- */
+.feat-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:52px}
+@media(min-width:580px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.feat-grid{grid-template-columns:repeat(3,1fr)}}
+.feat-card{background:var(--canopy);border:1px solid var(--border);border-radius:var(--r);padding:24px;transition:border-color .2s,transform .2s}
+.feat-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.feat-icon{font-size:22px;margin-bottom:14px}
+.feat-card h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.feat-card p{font-size:14px;color:var(--muted);line-height:1.55}
 
-  /* logos row */
-  .logo-mark { color: #8A847A; opacity: 0.85; transition: opacity .2s ease, color .2s ease; }
-  .logo-mark:hover { opacity: 1; color: #2D2A26; }
+/* ---- BOOKS ---- */
+.scroller{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin:40px -24px 0;padding-left:24px;padding-right:24px}
+@media(min-width:768px){.scroller{margin-left:0;margin-right:0;padding-left:0;padding-right:0}}
+.scroller::-webkit-scrollbar{height:4px}
+.scroller::-webkit-scrollbar-thumb{background:var(--leaf);border-radius:4px}
+.book{flex:0 0 200px;aspect-ratio:.68/1;border-radius:10px;scroll-snap-align:start;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.45);transition:transform .3s,box-shadow .3s;cursor:pointer}
+@media(min-width:768px){.book{flex:0 0 230px}}
+.book:hover{transform:translateY(-6px) rotate(-1.5deg);box-shadow:0 28px 56px rgba(0,0,0,.55)}
+.book-spine{position:absolute;left:0;top:0;bottom:0;width:8px;background:rgba(0,0,0,.25)}
+.book-label{position:absolute;top:14px;left:18px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(212,168,83,.75)}
+.book-title{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.book-title p{font-size:16px;font-weight:700;line-height:1.3;color:#fff}
+.book-title span{font-size:12px;color:rgba(255,255,255,.6);font-style:italic}
+.book-hover{position:absolute;inset:0;opacity:0;transition:opacity .25s;background:rgba(13,31,22,.9);padding:16px;display:flex;flex-direction:column;justify-content:flex-end;font-size:13px;line-height:1.6;color:var(--cream);font-style:italic}
+.book:hover .book-hover{opacity:1}
+.book-cta{font-size:10px;font-style:normal;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-top:10px}
 
-  /* Carousel scroll */
-  .scroller { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-  .scroller > * { scroll-snap-align: start; }
-  .scroller::-webkit-scrollbar { height: 8px; }
-  .scroller::-webkit-scrollbar-thumb { background: rgba(45,42,38,0.15); border-radius: 999px; }
+/* ---- TESTIMONIALS ---- */
+.quote-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:52px}
+@media(min-width:680px){.quote-grid{grid-template-columns:repeat(3,1fr)}}
+.quote-card{background:var(--canopy);border:1px solid var(--border);border-radius:var(--r);padding:28px;display:flex;flex-direction:column}
+.qmark{font-family:Georgia,serif;font-size:36px;color:var(--gold);line-height:1;margin-bottom:10px}
+.quote-card blockquote{font-size:15px;line-height:1.65;flex:1}
+.quote-attr{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--canopy);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:16px;color:var(--gold);flex-shrink:0}
+.qname{font-size:14px;font-weight:700}
+.qsub{font-size:12px;color:var(--muted)}
 
-  /* keyframes */
-  @keyframes twinkle { 0%,100% { opacity: 0.35 } 50% { opacity: 1 } }
-  .twinkle { animation: twinkle 4s ease-in-out infinite; }
-  .twinkle.delay-1 { animation-delay: 1.2s; }
-  .twinkle.delay-2 { animation-delay: 2.4s; }
+/* ---- PRICING ---- */
+.price-grid{display:grid;grid-template-columns:1fr;gap:18px;max-width:720px;margin:52px auto 0}
+@media(min-width:600px){.price-grid{grid-template-columns:repeat(2,1fr)}}
+.price-card{background:var(--grove);border:1.5px solid var(--border);border-radius:var(--r);padding:32px;position:relative}
+.price-card.featured{border-color:var(--gold)}
+.price-badge{position:absolute;top:-12px;left:24px;background:var(--gold);color:var(--forest);font-size:11px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.price-name{font-size:22px;font-weight:700;margin-bottom:4px}
+.price-desc{font-size:14px;color:var(--muted);margin-bottom:22px}
+.price-amt{font-family:'Lora',serif;font-size:52px;line-height:1}
+.price-amt span{font-family:inherit;font-size:16px;font-weight:400;color:var(--muted)}
+.price-list{list-style:none;margin:22px 0;display:flex;flex-direction:column;gap:10px}
+.price-list li{font-size:14px;display:flex;gap:9px;align-items:flex-start}
+.ck{color:var(--green);flex-shrink:0;margin-top:2px;font-weight:700}
+.cx{color:var(--muted);flex-shrink:0;margin-top:2px}
+.price-list li.dim{color:var(--muted)}
 
-  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
-  .float { animation: float 8s ease-in-out infinite; }
+/* ---- FAQ ---- */
+.faq-list{margin-top:44px}
+details.faq{border-top:1px solid var(--border)}
+details.faq:last-of-type{border-bottom:1px solid var(--border)}
+details.faq summary{list-style:none;cursor:pointer;padding:20px 0;display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:17px;font-weight:600;user-select:none}
+details.faq summary::-webkit-details-marker{display:none}
+.faq-ico{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform .25s,background .2s,border-color .2s;color:var(--muted)}
+details.faq[open] .faq-ico{transform:rotate(45deg);background:var(--gold);border-color:var(--gold);color:var(--forest)}
+.faq-body{padding-bottom:20px;color:var(--muted);font-size:15px;max-width:62ch;line-height:1.65}
+
+/* ---- CTA BOX ---- */
+.cta-box{background:var(--grove);border:1px solid var(--border);border-radius:20px;padding:56px 28px;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:"";position:absolute;inset:0;background:radial-gradient(700px 350px at 50% 110%,rgba(212,168,83,.07),transparent 60%);pointer-events:none}
+.cta-box h2{font-family:'Lora',serif;font-size:clamp(28px,5vw,56px);line-height:1.1;letter-spacing:-.02em;margin:10px 0 14px}
+.cta-box p{color:var(--muted);font-size:17px;max-width:44ch;margin:0 auto}
+.cta-form{display:flex;flex-direction:column;gap:10px;max-width:420px;margin:28px auto 0}
+@media(min-width:500px){.cta-form{flex-direction:row}.cta-form input{flex:1}.cta-form .btn{flex-shrink:0}}
+
+/* ---- FOOTER ---- */
+footer{background:var(--grove);border-top:1px solid var(--border);padding:56px 24px 28px}
+.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:40px}
+@media(min-width:768px){.footer-grid{grid-template-columns:1.6fr repeat(4,1fr);gap:28px}}
+.fcol h4{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.fcol a{font-size:14px;color:var(--muted);transition:color .2s}
+.fcol a:hover{color:var(--cream)}
+.footer-btm{max-width:1200px;margin:32px auto 0;padding-top:22px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-size:13px;color:var(--muted)}
+
+/* ---- MOBILE STICKY BAR ---- */
+.sticky-bar{display:none;position:fixed;bottom:0;inset-x:0;z-index:90;background:rgba(13,31,22,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:10px 16px 14px;gap:10px;transform:translateY(100%);transition:transform .3s}
+
+/* ---- MODAL ---- */
+.modal-wrap{position:fixed;inset:0;z-index:200;background:rgba(13,31,22,.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-wrap.open{opacity:1;pointer-events:all}
+.modal{background:var(--grove);border:1.5px solid var(--border);border-radius:20px;padding:32px 28px;width:100%;max-width:460px;transform:translateY(16px);transition:transform .25s;position:relative;max-height:90svh;overflow-y:auto}
+.modal-wrap.open .modal{transform:translateY(0)}
+.modal-x{position:absolute;top:14px;right:14px;background:var(--canopy);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:color .2s}
+.modal-x:hover{color:var(--cream)}
+.modal-dots{display:flex;gap:6px;justify-content:center;margin-bottom:28px}
+.dot{width:28px;height:4px;border-radius:2px;background:var(--canopy);transition:background .25s}
+.dot.on{background:var(--gold)}
+.modal h3{font-family:'Lora',serif;font-size:24px;margin-bottom:6px}
+.modal .msub{color:var(--muted);font-size:14px;margin-bottom:20px}
+.mlabel{font-size:12px;font-weight:700;color:var(--gold);display:block;margin-bottom:8px;letter-spacing:.08em}
+.age-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 20px}
+.age-btn{padding:10px 18px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.age-btn:hover,.age-btn.on{border-color:var(--gold);color:var(--forest);background:var(--gold)}
+.tag-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 20px}
+.tag-btn{padding:9px 14px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.tag-btn:hover,.tag-btn.on{border-color:var(--gold);color:var(--forest);background:var(--gold)}
+.theme-list{display:flex;flex-direction:column;gap:8px;margin:10px 0 20px}
+.theme-btn{padding:14px 16px;border-radius:var(--rsm);text-align:left;border:1.5px solid var(--border);background:var(--canopy);color:var(--cream);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
+.theme-btn:hover,.theme-btn.on{border-color:var(--gold);background:rgba(212,168,83,.1)}
+.modal-row{display:flex;gap:10px;align-items:center}
+
+/* ---- RESPONSIVE SHOW/HIDE ---- */
+@media(max-width:767px){
+  .hide-sm{display:none!important}
+  .nav-links{display:none}
+  .hbg{display:flex}
+  body{padding-bottom:72px}
+  .sticky-bar{display:flex}
+}
+@media(min-width:768px){.hide-lg{display:none!important}}
+
+.row-center{display:flex;justify-content:center;margin-top:36px}
 </style>
 </head>
-<body class="bg-cream text-ink">
+<body>
 
 <!-- NAV -->
-<header id="nav" class="fixed top-0 inset-x-0 z-50 border-b border-transparent">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-    <a href="#top" class="flex items-center gap-2 group">
-      <svg viewBox="0 0 24 24" class="w-5 h-5 text-coral" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>
-      </svg>
-      <span class="font-serif text-[22px] tracking-tightish">Hush</span>
+<header id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <span class="serif" style="font-size:22px;font-weight:600;letter-spacing:-.02em">Hush</span>
     </a>
-
-    <nav class="hidden md:flex items-center gap-8 text-[14.5px] text-ink2">
-      <a href="#how" class="hover:text-ink ulink">How it works</a>
-      <a href="#examples" class="hover:text-ink ulink">Examples</a>
-      <a href="#pricing" class="hover:text-ink ulink">Pricing</a>
-      <a href="#faq" class="hover:text-ink ulink">FAQ</a>
-    </nav>
-
-    <div class="flex items-center gap-3">
-      <a href="#" class="hidden sm:inline text-[14.5px] text-ink2 hover:text-ink ulink">Sign in</a>
-      <a href="#cta" class="btn btn-coral text-[14.5px]">Create your first story free</a>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#examples">Examples</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="#" class="btn btn-ghost hide-sm">Sign in</a>
+      <button class="btn btn-gold hide-sm" onclick="openModal()" style="font-size:14px;padding:11px 18px">Create a story free</button>
+      <button class="hbg hide-lg" id="hbg" onclick="toggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
 
+<!-- MOBILE NAV -->
+<div id="mnav">
+  <a href="#how" onclick="closeNav()">How it works</a>
+  <a href="#examples" onclick="closeNav()">Examples</a>
+  <a href="#pricing" onclick="closeNav()">Pricing</a>
+  <a href="#faq" onclick="closeNav()">FAQ</a>
+  <button class="btn btn-gold" onclick="closeNav();openModal()" style="font-size:18px;padding:18px 36px;margin-top:12px">Create a story free →</button>
+</div>
+
 <a id="top"></a>
 
 <!-- HERO -->
-<section class="paper-grain pt-28 md:pt-36 pb-20 md:pb-28 relative overflow-hidden">
-  <svg class="absolute top-24 left-[6%] w-3 h-3 text-coral twinkle" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-  <svg class="absolute top-40 right-[8%] w-2.5 h-2.5 text-sage twinkle delay-1" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-  <svg class="absolute bottom-16 left-[12%] w-2 h-2 text-coral twinkle delay-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 items-center relative">
-    <div class="lg:col-span-7">
-      <p class="small-caps text-sageDk mb-5">Bedtime stories, made just for them</p>
-      <h1 class="font-serif text-[44px] sm:text-[56px] lg:text-[72px] leading-[1.02] tracking-tighter2 text-ink">
-        A new bedtime story
-        every night.
-        <span class="italic text-coral">Starring your child.</span>
-      </h1>
-      <p class="mt-7 text-[18px] md:text-[19px] text-ink2 max-w-[58ch]">
-        Tell us their name and what they love. We'll write and illustrate a one-of-a-kind story in 30 seconds. Ready by bedtime.
-      </p>
-
-      <div class="mt-9 flex flex-wrap items-center gap-4">
-        <a href="#cta" class="btn btn-coral text-[15px]">
-          Create your first story free
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-        </a>
-        <a href="#examples" class="btn btn-ghost text-[15px]">Read an example →</a>
-      </div>
-
-      <p class="mt-8 text-[13.5px] text-ink3">
-        Loved by 12,000+ families&nbsp; · &nbsp;Age 2 to 9&nbsp; · &nbsp;No credit card needed
-      </p>
+<section class="hero">
+  <div id="starfield" aria-hidden="true"></div>
+  <div class="container" style="position:relative">
+    <p class="label" style="margin-bottom:16px">✦ New personalized story, every night</p>
+    <h1>Tonight, your child<br><em>is the hero.</em></h1>
+    <p class="hero-sub">Type their name — we'll write and illustrate a bedtime story starring them in 30 seconds. Free to start.</p>
+    <div class="hero-form">
+      <input id="hero-name" type="text" placeholder="Your child's name…" autocomplete="off" onkeydown="if(event.key==='Enter')heroGo()">
+      <button class="btn btn-gold" onclick="heroGo()" style="padding:14px 20px">
+        Create their story
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
     </div>
-
-    <!-- Storybook spread mock -->
-    <div class="lg:col-span-5 relative">
-      <div class="tilt float relative max-w-[520px] mx-auto">
-        <div class="absolute -bottom-3 left-3 right-3 h-10 rounded-full" style="background: radial-gradient(closest-side, rgba(45,42,38,0.25), transparent 70%); filter: blur(8px);"></div>
-
-        <div class="book">
-          <!-- LEFT PAGE -->
-          <div class="page left">
-            <div class="h-full flex flex-col">
-              <p class="font-serif italic text-[13px] text-ink3 mb-3">Chapter Two</p>
-              <p class="font-serif text-[15px] md:text-[16px] leading-[1.55] text-ink">
-                Mira tiptoed past the moon-lamp and pushed open the door. Inside, the dragon was already yawning. <span class="italic">"You're late,"</span> he whispered, scales the colour of warm tea.
-              </p>
-              <p class="font-serif text-[15px] md:text-[16px] leading-[1.55] text-ink mt-3">
-                <span class="italic">"I brought you a story,"</span> said Mira, and she climbed up beside him.
-              </p>
-              <div class="mt-auto flex items-center justify-between text-[11px] text-ink3 font-serif italic">
-                <span>— 8 —</span>
-                <span>Mira and the Sleepy Dragon</span>
-              </div>
-            </div>
-          </div>
-          <!-- RIGHT PAGE: illustration placeholder -->
-          <div class="page right">
-            <div class="relative h-full rounded-md stripes-coral overflow-hidden border border-coral/20">
-              <svg class="absolute top-3 right-3 w-9 h-9 text-coral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-              <svg class="absolute top-6 left-5 w-2 h-2 text-coralDk" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-              <svg class="absolute top-10 left-12 w-1.5 h-1.5 text-coralDk" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-              <svg class="absolute bottom-0 left-0 right-0 w-full" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M0 60 Q 50 30 100 50 T 200 55 L 200 80 L 0 80 Z" fill="#C25E3F" opacity="0.55"/>
-                <path d="M0 70 Q 60 50 110 65 T 200 68 L 200 80 L 0 80 Z" fill="#C25E3F" opacity="0.85"/>
-              </svg>
-              <p class="absolute inset-x-0 bottom-2 text-center font-mono text-[10px] tracking-wider text-coralDk/70">illustration · spread 2</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- bookmark ribbon -->
-        <div class="absolute -top-2 right-12 w-3 h-16 bg-sage rounded-b-sm shadow"></div>
-
-        <p class="mt-6 text-center font-serif italic text-[13px] text-ink3">"Mira and the Sleepy Dragon" — generated for Mira, age 4, Brooklyn</p>
-      </div>
+    <p class="hero-nudge">No credit card · 3 free stories/month · Ready in 30 seconds</p>
+    <div class="trust-row">
+      <span><strong>12,000+</strong> families</span>
+      <span class="divider">·</span>
+      <span>Ages <strong>2–9</strong></span>
+      <span class="divider">·</span>
+      <span>⭐ <strong>4.9</strong>/5 · 2,400 reviews</span>
+      <span class="divider">·</span>
+      <span><strong>47,000+</strong> stories created</span>
     </div>
   </div>
 </section>
 
-<!-- SOCIAL PROOF -->
-<section class="py-12 md:py-14 border-y border-ink/[0.07]">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <p class="text-center small-caps text-ink3 mb-7">Featured in</p>
-    <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-16">
-      <span class="logo-mark font-serif italic text-[22px]">Parents</span>
-      <span class="logo-mark font-sans font-bold tracking-tightish text-[20px]">Romper</span>
-      <span class="logo-mark font-serif text-[22px] tracking-tightish">Today</span>
-      <span class="logo-mark font-serif text-[18px] tracking-tightish">NYT&nbsp;Parenting</span>
-      <span class="logo-mark font-sans font-semibold text-[18px]">TechCrunch</span>
-      <span class="logo-mark font-sans font-bold text-[18px] tracking-tighter2">Mashable</span>
+<!-- PRESS BAR -->
+<div class="press-bar">
+  <div class="container text-center">
+    <p class="label" style="color:var(--muted)">Featured in</p>
+    <div class="press-row">
+      <span class="press-logo serif" style="font-style:italic">Parents</span>
+      <span class="press-logo">Romper</span>
+      <span class="press-logo serif">Today</span>
+      <span class="press-logo" style="font-size:13px">NYT Parenting</span>
+      <span class="press-logo">TechCrunch</span>
+      <span class="press-logo">Mashable</span>
     </div>
   </div>
-</section>
+</div>
 
 <!-- HOW IT WORKS -->
-<section id="how" class="py-24 md:py-32">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="max-w-2xl">
-      <p class="small-caps text-sageDk mb-4">How it works</p>
-      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
-        From idea to "again, again!" in three small steps.
-      </h2>
+<section id="how" class="sec">
+  <div class="container">
+    <div class="sh">
+      <p class="label">How it works</p>
+      <h2>From blank page to "read it again!" in 30 seconds.</h2>
+      <p>No writing skills needed. No complicated setup. Just their name — and we handle the rest.</p>
     </div>
-
-    <div class="mt-16 grid md:grid-cols-3 gap-10 md:gap-8">
-      <!-- Step 1 -->
-      <div class="relative">
-        <div class="w-full aspect-[5/4] rounded-card stripes-sage flex items-center justify-center mb-6 relative overflow-hidden">
-          <svg viewBox="0 0 120 100" class="w-3/5 h-3/5" aria-hidden="true">
-            <rect x="14" y="14" width="92" height="72" rx="8" fill="#FAF6F0" stroke="#6F8868" stroke-width="1.6"/>
-            <line x1="26" y1="34" x2="86" y2="34" stroke="#6F8868" stroke-width="1.4" stroke-linecap="round"/>
-            <line x1="26" y1="48" x2="94" y2="48" stroke="#6F8868" stroke-width="1.4" stroke-linecap="round"/>
-            <line x1="26" y1="62" x2="74" y2="62" stroke="#6F8868" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="98" cy="22" r="4" fill="#D97757"/>
-          </svg>
-        </div>
-        <div class="flex items-baseline gap-3">
-          <span class="font-serif italic text-coral text-[22px]">01</span>
-          <h3 class="font-serif text-[24px] tracking-tightish text-ink">Tell us about your child</h3>
-        </div>
-        <p class="mt-3 text-ink2 max-w-[36ch]">Their name, age, what they love — dinosaurs, space, kindness. The smaller the detail, the bigger the smile.</p>
+    <div class="step-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h3>Tell us who they are</h3>
+        <p>Name, age, and the 2–3 things they're obsessed with right now. Dinosaurs? The moon? A specific stuffed bunny?</p>
       </div>
-
-      <!-- Step 2 -->
-      <div class="relative md:mt-12">
-        <div class="w-full aspect-[5/4] rounded-card stripes-coral flex items-center justify-center mb-6 relative overflow-hidden">
-          <svg viewBox="0 0 120 100" class="w-3/5 h-3/5" aria-hidden="true">
-            <rect x="14" y="22" width="40" height="56" rx="6" fill="#FAF6F0" stroke="#C25E3F" stroke-width="1.6"/>
-            <rect x="62" y="14" width="44" height="64" rx="6" fill="#FAF6F0" stroke="#C25E3F" stroke-width="1.6"/>
-            <path d="M22 38 h24 M22 50 h20 M22 62 h16" stroke="#C25E3F" stroke-width="1.4" stroke-linecap="round"/>
-            <path d="M70 30 h28 M70 42 h28 M70 54 h22 M70 66 h18" stroke="#C25E3F" stroke-width="1.4" stroke-linecap="round"/>
-            <circle cx="84" cy="14" r="4" fill="#D97757"/>
-          </svg>
-        </div>
-        <div class="flex items-baseline gap-3">
-          <span class="font-serif italic text-coral text-[22px]">02</span>
-          <h3 class="font-serif text-[24px] tracking-tightish text-ink">Choose tonight's adventure</h3>
-        </div>
-        <p class="mt-3 text-ink2 max-w-[36ch]">Pick a theme or lesson — sharing, courage, the moon. Or let us surprise you with something new.</p>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h3>Pick tonight's adventure</h3>
+        <p>Choose a theme — bravery, sharing, dragons — or hit "surprise me." A genuinely new story every night.</p>
       </div>
-
-      <!-- Step 3 -->
-      <div class="relative md:mt-24">
-        <div class="w-full aspect-[5/4] rounded-card stripes-cream flex items-center justify-center mb-6 relative overflow-hidden">
-          <svg viewBox="0 0 120 100" class="w-3/5 h-3/5" aria-hidden="true">
-            <path d="M14 30 Q 60 18 60 28 Q 60 18 106 30 L 106 78 Q 60 66 60 76 Q 60 66 14 78 Z"
-                  fill="#FAF6F0" stroke="#2D2A26" stroke-width="1.6" stroke-linejoin="round"/>
-            <line x1="60" y1="28" x2="60" y2="76" stroke="#2D2A26" stroke-width="1.2"/>
-            <path d="M22 40 h28 M22 50 h26 M22 60 h22" stroke="#2D2A26" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
-            <circle cx="86" cy="46" r="6" fill="#D97757"/>
-            <path d="M72 60 q14 -10 28 0" stroke="#2D2A26" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
-          </svg>
-        </div>
-        <div class="flex items-baseline gap-3">
-          <span class="font-serif italic text-coral text-[22px]">03</span>
-          <h3 class="font-serif text-[24px] tracking-tightish text-ink">Read together</h3>
-        </div>
-        <p class="mt-3 text-ink2 max-w-[36ch]">Story and illustrations ready in 30 seconds. Read on screen, listen to narration, or print.</p>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h3>Read together, right now</h3>
+        <p>Full story + illustrations in 30 seconds. Read on screen, listen with narration, or send to print.</p>
       </div>
     </div>
-
-    <div class="mt-16 flex justify-center">
-      <a href="#cta" class="btn btn-coral text-[15px]">Create your first story free
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-      </a>
+    <div class="row-center">
+      <button class="btn btn-gold" onclick="openModal()">
+        Start making your story
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
     </div>
   </div>
 </section>
 
-<!-- FEATURE GRID -->
-<section class="bg-cream2 py-24 md:py-32">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="max-w-2xl mb-14">
-      <p class="small-caps text-sageDk mb-4">What's inside</p>
-      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
-        Built for the eight minutes that matter most.
-      </h2>
-      <p class="mt-5 text-[17px] text-ink2 max-w-[58ch]">Everything in Hush is shaped by one question — would we read this to our own kids tonight?</p>
+<!-- FEATURES -->
+<section class="sec alt">
+  <div class="container">
+    <div class="sh">
+      <p class="label">What's inside</p>
+      <h2>Built for the 8 minutes that matter most.</h2>
+      <p>Every feature answers one question — would we use this at our own kids' bedtime?</p>
     </div>
-
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div class="feat bg-cream rounded-card p-7 shadow-soft">
-        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-        </div>
-        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Personalized characters</h3>
-        <p class="mt-2 text-ink2">Your child's name, age, and favorite things baked into every story.</p>
-      </div>
-
-      <div class="feat bg-cream rounded-card p-7 shadow-soft">
-        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4.5-6 4 5L15 11l6 8H3z"/><circle cx="8" cy="7" r="2"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-        </div>
-        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Original illustrations</h3>
-        <p class="mt-2 text-ink2">Hand-styled AI art on every page. Never recycled, never stock.</p>
-      </div>
-
-      <div class="feat bg-cream rounded-card p-7 shadow-soft">
-        <div class="w-11 h-11 rounded-full bg-sage/15 text-sageDk flex items-center justify-center mb-5">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        </div>
-        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Safe by default</h3>
-        <p class="mt-2 text-ink2">Filtered prompts, age-appropriate themes, parent-reviewed templates.</p>
-      </div>
-
-      <div class="feat bg-cream rounded-card p-7 shadow-soft">
-        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M16 8a4 4 0 0 1 0 8"/><path d="M19 5a8 8 0 0 1 0 14"/></svg>
-        </div>
-        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Audio narration</h3>
-        <p class="mt-2 text-ink2">A warm bedtime voice reads aloud while you cuddle.</p>
-      </div>
-
-      <div class="feat bg-cream rounded-card p-7 shadow-soft">
-        <div class="w-11 h-11 rounded-full bg-coral/10 text-coral flex items-center justify-center mb-5">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="14" rx="1"/><path d="M6 17h12v4H6z"/><path d="M9 7h6M9 11h6"/></svg>
-        </div>
-        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Print or screen</h3>
-        <p class="mt-2 text-ink2">Send to print, save as PDF, or read in our app.</p>
-      </div>
-
-      <div class="feat bg-cream rounded-card p-7 shadow-soft">
-        <div class="w-11 h-11 rounded-full bg-sage/15 text-sageDk flex items-center justify-center mb-5">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M4 17a3 3 0 0 1 3-3h12"/></svg>
-        </div>
-        <h3 class="font-serif text-[22px] tracking-tightish text-ink">Personal library</h3>
-        <p class="mt-2 text-ink2">Every story saved forever in your child's collection.</p>
-      </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">🧒</div><h3>Personalized hero</h3><p>Name, age, and interests woven into every page. It's genuinely <em>their</em> story.</p></div>
+      <div class="feat-card"><div class="feat-icon">🎨</div><h3>Original illustrations</h3><p>Custom AI art on every spread. Never recycled, never stock. Each book looks one-of-a-kind.</p></div>
+      <div class="feat-card"><div class="feat-icon">🔒</div><h3>Safe by design</h3><p>Age-appropriate themes, filtered prompts, parent-reviewed templates. Always.</p></div>
+      <div class="feat-card"><div class="feat-icon">🎙️</div><h3>Narration mode</h3><p>A warm bedtime voice reads aloud while you cuddle. Hands-free bedtime.</p></div>
+      <div class="feat-card"><div class="feat-icon">📖</div><h3>Print or screen</h3><p>Save as PDF, send to print, or read in-app. Real books with their face on them.</p></div>
+      <div class="feat-card"><div class="feat-icon">📚</div><h3>Growing library</h3><p>Every story saved forever. Some families have 80+ personalized books by year two.</p></div>
     </div>
   </div>
 </section>
 
-<!-- EXAMPLES CAROUSEL -->
-<section id="examples" class="py-24 md:py-32">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="flex items-end justify-between gap-6 mb-12 flex-wrap">
-      <div class="max-w-2xl">
-        <p class="small-caps text-sageDk mb-4">Examples</p>
-        <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
-          Real stories, real kids. Hover to peek inside.
-        </h2>
+<!-- EXAMPLES -->
+<section id="examples" class="sec">
+  <div class="container">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div class="sh">
+        <p class="label">Real stories</p>
+        <h2>Hover to peek inside.</h2>
       </div>
-      <a href="#cta" class="hidden md:inline-flex btn btn-ghost text-[15px] text-ink hover:text-coral">Browse the library →</a>
+      <button class="btn btn-outline hide-sm" onclick="openModal()">Browse the library →</button>
     </div>
-
-    <div class="scroller flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 lg:mx-0 lg:px-0">
-      <!-- Cover 1 -->
-      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#2D2A26 0%, #4A3F35 100%);">
-        <div class="spine"></div>
-        <div class="absolute inset-0 p-5">
-          <p class="small-caps text-coral/90 text-[10px]">A Hush original</p>
-          <svg class="absolute top-12 right-6 w-12 h-12 text-cream" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-          <svg class="absolute top-20 left-8 w-2 h-2 text-cream/80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-          <svg class="absolute top-28 left-16 w-1.5 h-1.5 text-cream/70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-          <svg class="absolute bottom-16 left-0 right-0 w-full" viewBox="0 0 200 60" preserveAspectRatio="none"><path d="M0 40 Q 60 10 120 30 T 200 35 L 200 60 L 0 60 Z" fill="#D97757" opacity="0.6"/><path d="M0 50 Q 50 30 110 45 T 200 50 L 200 60 L 0 60 Z" fill="#D97757"/></svg>
-        </div>
-        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(0,0,0,0.55));">
-          <p class="font-serif text-cream text-[20px] leading-tight tracking-tightish">Mira and the<br/>Sleepy Dragon</p>
-          <p class="mt-1 font-serif italic text-cream/70 text-[12px]">starring Mira, age 4</p>
-        </div>
-        <div class="preview">
-          <p>"You're late," whispered the dragon, scales the colour of warm tea. Mira climbed up beside him with a story tucked under her arm…</p>
-          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
-        </div>
-      </a>
-
-      <!-- Cover 2 -->
-      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#9CAF88 0%, #6F8868 100%);">
-        <div class="spine"></div>
-        <div class="absolute inset-0 p-5">
-          <p class="small-caps text-cream/90 text-[10px]">A Hush original</p>
-          <svg class="absolute top-14 left-1/2 -translate-x-1/2 w-2/3 h-32 text-cream" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 100 Q 50 20 100 80 T 190 60" stroke-dasharray="3 5" opacity="0.7"/>
-            <path d="M150 30 L 170 30 L 170 60 Q 178 64 178 72 L 178 86 Q 178 96 168 96 L 152 96 Q 142 96 142 86 L 142 70 Q 150 66 150 60 Z" fill="#FFF8F1" stroke="#2D2A26" stroke-width="1.4"/>
-            <line x1="150" y1="40" x2="170" y2="40" stroke="#D97757" stroke-width="2"/>
-          </svg>
-        </div>
-        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(0,0,0,0.4));">
-          <p class="font-serif text-cream text-[20px] leading-tight tracking-tightish">Leo's Lost Sock<br/>Adventure</p>
-          <p class="mt-1 font-serif italic text-cream/80 text-[12px]">starring Leo, age 6</p>
-        </div>
-        <div class="preview">
-          <p>The left sock was definitely under the couch. Probably. Leo had a flashlight, a map, and one very curious cat named Pickle…</p>
-          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
-        </div>
-      </a>
-
-      <!-- Cover 3 -->
-      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#F0E9DD 0%, #E6DCCB 100%);">
-        <div class="spine"></div>
-        <div class="absolute inset-0 p-5 text-ink">
-          <p class="small-caps text-coral text-[10px]">A Hush original</p>
-          <div class="absolute top-12 left-1/2 -translate-x-1/2 w-28 h-28 rounded-full" style="background: radial-gradient(circle at 35% 35%, #FFF8F1, #F4D9A9 70%, #D9B574); box-shadow: inset -8px -10px 0 rgba(45,42,38,0.06);"></div>
-          <div class="absolute top-20 left-1/2 -translate-x-12 w-1.5 h-1.5 rounded-full bg-ink/40"></div>
-          <div class="absolute top-24 left-1/2 translate-x-2 w-1 h-1 rounded-full bg-ink/30"></div>
-          <div class="absolute top-32 left-1/2 -translate-x-2 w-1 h-1 rounded-full bg-ink/30"></div>
-          <div class="absolute bottom-24 left-4 right-4 h-3 rounded-sm bg-coral/70"></div>
-        </div>
-        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(45,42,38,0.10));">
-          <p class="font-serif text-ink text-[20px] leading-tight tracking-tightish">Aria Visits the<br/>Moon Bakery</p>
-          <p class="mt-1 font-serif italic text-ink2 text-[12px]">starring Aria, age 5</p>
-        </div>
-        <div class="preview">
-          <p>The bakery smelled of warm clouds and butter. The baker — a very tall rabbit — handed Aria a glowing bun and winked…</p>
-          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
-        </div>
-      </a>
-
-      <!-- Cover 4 -->
-      <a href="#cta" class="cover shrink-0 w-[260px] md:w-[280px]" style="background: linear-gradient(160deg,#D97757 0%, #C25E3F 100%);">
-        <div class="spine"></div>
-        <div class="absolute inset-0 p-5">
-          <p class="small-caps text-cream/95 text-[10px]">A Hush original</p>
-          <svg class="absolute top-12 left-6 w-20 h-20 text-cream" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 40 L 18 22 L 26 28 L 34 22 L 42 40 Z"/>
-            <circle cx="22" cy="34" r="1.2" fill="currentColor"/>
-            <circle cx="32" cy="34" r="1.2" fill="currentColor"/>
-            <path d="M24 38 q 3 2 6 0"/>
-            <path d="M42 40 q 6 -4 8 -10"/>
-          </svg>
-          <svg class="absolute top-20 right-4 w-16 h-16 text-cream/90" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 40 L 18 22 L 26 28 L 34 22 L 42 40 Z"/>
-            <circle cx="22" cy="34" r="1.2" fill="currentColor"/>
-            <circle cx="32" cy="34" r="1.2" fill="currentColor"/>
-            <path d="M24 38 q 3 2 6 0"/>
-          </svg>
-        </div>
-        <div class="title-area" style="background: linear-gradient(180deg, transparent, rgba(0,0,0,0.45));">
-          <p class="font-serif text-cream text-[20px] leading-tight tracking-tightish">How Finn Made<br/>a New Friend</p>
-          <p class="mt-1 font-serif italic text-cream/80 text-[12px]">starring Finn, age 3</p>
-        </div>
-        <div class="preview">
-          <p>The new fox at the den was very, very quiet. Finn took a deep breath and offered the only thing she had — half of a very good acorn…</p>
-          <p class="mt-3 small-caps text-coral text-[10px]">Read this story →</p>
-        </div>
-      </a>
-
-      <div class="shrink-0 w-2"></div>
+    <div class="scroller">
+      <div class="book" style="background:linear-gradient(155deg,#1a2e22,#2a4a35)" onclick="openModal()">
+        <div class="book-spine"></div>
+        <div class="book-label">A Hush original</div>
+        <svg style="position:absolute;top:44px;right:18px;width:40px;height:40px;color:var(--gold);opacity:.6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        <div class="book-title"><p>Mira and the<br>Sleepy Dragon</p><span>starring Mira, age 4</span></div>
+        <div class="book-hover">"You're late," whispered the dragon, scales the colour of warm tea. Mira climbed up beside him with a story tucked under her arm…<div class="book-cta">Read this story →</div></div>
+      </div>
+      <div class="book" style="background:linear-gradient(155deg,#1e3828,#2d5a3c)" onclick="openModal()">
+        <div class="book-spine"></div>
+        <div class="book-label">A Hush original</div>
+        <div class="book-title"><p>Leo's Lost Sock<br>Adventure</p><span>starring Leo, age 6</span></div>
+        <div class="book-hover">The left sock was definitely under the couch. Probably. Leo had a flashlight, a map, and one very curious cat named Pickle…<div class="book-cta">Read this story →</div></div>
+      </div>
+      <div class="book" style="background:linear-gradient(155deg,#2a1f10,#4a3520)" onclick="openModal()">
+        <div class="book-spine"></div>
+        <div class="book-label">A Hush original</div>
+        <div class="book-title"><p>Aria Visits the<br>Moon Bakery</p><span>starring Aria, age 5</span></div>
+        <div class="book-hover">The bakery smelled of warm clouds and butter. The baker — a very tall rabbit — handed Aria a glowing bun and winked…<div class="book-cta">Read this story →</div></div>
+      </div>
+      <div class="book" style="background:linear-gradient(155deg,#3a1a10,#5a2a18)" onclick="openModal()">
+        <div class="book-spine"></div>
+        <div class="book-label">A Hush original</div>
+        <div class="book-title"><p>How Finn Made<br>a New Friend</p><span>starring Finn, age 3</span></div>
+        <div class="book-hover">The new fox at the den was very, very quiet. Finn took a deep breath and offered half of a very good acorn…<div class="book-cta">Read this story →</div></div>
+      </div>
+      <div style="flex:0 0 8px"></div>
+    </div>
+    <div class="row-center">
+      <button class="btn btn-outline" onclick="openModal()">Create a story for your child →</button>
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section class="bg-cream2 py-24 md:py-32">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="max-w-2xl mb-14">
-      <p class="small-caps text-sageDk mb-4">Parents talking</p>
-      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
-        Bedtime, but the good kind.
-      </h2>
+<section class="sec alt">
+  <div class="container">
+    <div class="sh">
+      <p class="label">Parents talking</p>
+      <h2>Bedtime went from battle to highlight.</h2>
     </div>
-
-    <div class="grid md:grid-cols-3 gap-5">
-      <figure class="bg-cream rounded-card p-8 shadow-soft flex flex-col">
-        <svg class="w-7 h-7 text-coral mb-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4H8c0 2 1 4 3 5v2c-3-1-5-4-5-7V7zm9 0h4v4h-3c0 2 1 4 3 5v2c-3-1-5-4-5-7V7z"/></svg>
-        <blockquote class="font-serif text-[19px] leading-[1.5] text-ink">
-          "My daughter asks for 'her book' every single night now. She's 4 and she thinks Hush wrote it just for her. Honestly, it did."
-        </blockquote>
-        <figcaption class="mt-6 pt-6 border-t border-ink/10 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-coral/20 text-coral flex items-center justify-center font-serif">S</div>
-          <div>
-            <p class="font-medium text-ink text-[14.5px]">Sarah K.</p>
-            <p class="text-ink3 text-[13px]">Mom of two · Brooklyn</p>
-          </div>
+    <div class="quote-grid">
+      <figure class="quote-card">
+        <div class="qmark">"</div>
+        <blockquote>My daughter asks for 'her book' every single night now. She's 4 and genuinely believes Hush wrote it just for her. Honestly? It did.</blockquote>
+        <figcaption class="quote-attr">
+          <div class="avatar">S</div>
+          <div><p class="qname">Sarah K.</p><p class="qsub">Mom of two · Brooklyn</p></div>
         </figcaption>
       </figure>
-
-      <figure class="bg-cream rounded-card p-8 shadow-soft flex flex-col">
-        <svg class="w-7 h-7 text-coral mb-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4H8c0 2 1 4 3 5v2c-3-1-5-4-5-7V7zm9 0h4v4h-3c0 2 1 4 3 5v2c-3-1-5-4-5-7V7z"/></svg>
-        <blockquote class="font-serif text-[19px] leading-[1.5] text-ink">
-          "I was skeptical about AI writing for kids. Then I read one to my son. The illustrations are beautiful and the story had a real lesson about sharing. We're hooked."
-        </blockquote>
-        <figcaption class="mt-6 pt-6 border-t border-ink/10 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-sage/30 text-sageDk flex items-center justify-center font-serif">M</div>
-          <div>
-            <p class="font-medium text-ink text-[14.5px]">Marcus T.</p>
-            <p class="text-ink3 text-[13px]">Dad of one · Austin</p>
-          </div>
+      <figure class="quote-card">
+        <div class="qmark">"</div>
+        <blockquote>I was skeptical about AI for kids. Then I read one to my son. The illustrations are beautiful and there's an actual lesson. We're hooked.</blockquote>
+        <figcaption class="quote-attr">
+          <div class="avatar">M</div>
+          <div><p class="qname">Marcus T.</p><p class="qsub">Dad of one · Austin</p></div>
         </figcaption>
       </figure>
-
-      <figure class="bg-cream rounded-card p-8 shadow-soft flex flex-col">
-        <svg class="w-7 h-7 text-coral mb-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h4v4H8c0 2 1 4 3 5v2c-3-1-5-4-5-7V7zm9 0h4v4h-3c0 2 1 4 3 5v2c-3-1-5-4-5-7V7z"/></svg>
-        <blockquote class="font-serif text-[19px] leading-[1.5] text-ink">
-          "Best $9 I spend each month. We have 47 personalized books in our library. Bedtime is the highlight of our day again."
-        </blockquote>
-        <figcaption class="mt-6 pt-6 border-t border-ink/10 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-coral/20 text-coral flex items-center justify-center font-serif">P</div>
-          <div>
-            <p class="font-medium text-ink text-[14.5px]">Priya S.</p>
-            <p class="text-ink3 text-[13px]">Mom of three · Toronto</p>
-          </div>
+      <figure class="quote-card">
+        <div class="qmark">"</div>
+        <blockquote>Best $9 I spend each month. 47 personalized books in our library. My kids fight over whose story we read first.</blockquote>
+        <figcaption class="quote-attr">
+          <div class="avatar">P</div>
+          <div><p class="qname">Priya S.</p><p class="qsub">Mom of three · Toronto</p></div>
         </figcaption>
       </figure>
     </div>
@@ -594,221 +444,288 @@
 </section>
 
 <!-- PRICING -->
-<section id="pricing" class="py-24 md:py-32">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="max-w-2xl mb-14">
-      <p class="small-caps text-sageDk mb-4">Pricing</p>
-      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
-        Simple. Two plans. Cancel anytime.
-      </h2>
+<section id="pricing" class="sec">
+  <div class="container">
+    <div class="sh">
+      <p class="label">Pricing</p>
+      <h2>Two plans. No surprises.</h2>
+      <p>Start free tonight — no card needed. Upgrade when bedtime becomes the best part of the day.</p>
     </div>
-
-    <div class="grid md:grid-cols-2 gap-6 max-w-4xl">
-      <!-- Free -->
-      <div class="bg-cream rounded-card p-8 md:p-10 shadow-soft border border-ink/[0.06]">
-        <div class="flex items-baseline justify-between">
-          <h3 class="font-serif text-[28px] tracking-tightish">Free</h3>
-          <span class="small-caps text-ink3">Forever</span>
-        </div>
-        <p class="mt-2 text-ink2">For trying it out before bedtime tonight.</p>
-        <p class="mt-7 font-serif text-[48px] leading-none tracking-tighter2">$0<span class="text-[18px] text-ink3 font-sans font-normal"> /month</span></p>
-
-        <ul class="mt-8 space-y-3 text-[15px] text-ink">
-          <li class="flex gap-3"><span class="mt-1 text-sageDk">✓</span>3 stories per month</li>
-          <li class="flex gap-3"><span class="mt-1 text-sageDk">✓</span>Standard illustrations</li>
-          <li class="flex gap-3"><span class="mt-1 text-sageDk">✓</span>Read on screen</li>
-          <li class="flex gap-3 text-ink3"><span class="mt-1">—</span>Audio narration</li>
-          <li class="flex gap-3 text-ink3"><span class="mt-1">—</span>Print and PDF export</li>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-name">Free</div>
+        <div class="price-desc">Try it tonight. No card needed.</div>
+        <div class="price-amt">$0<span> /month</span></div>
+        <ul class="price-list">
+          <li><span class="ck">✓</span> 3 personalized stories/month</li>
+          <li><span class="ck">✓</span> Standard illustration style</li>
+          <li><span class="ck">✓</span> Read on screen</li>
+          <li class="dim"><span class="cx">–</span> Audio narration</li>
+          <li class="dim"><span class="cx">–</span> Print & PDF export</li>
+          <li class="dim"><span class="cx">–</span> Multiple child profiles</li>
         </ul>
-
-        <a href="#cta" class="mt-9 btn w-full justify-center bg-cream2 text-ink hover:bg-cream3 text-[15px] py-3.5">Start free</a>
+        <button class="btn btn-outline" onclick="openModal()" style="width:100%;justify-content:center;padding:14px">Start free →</button>
       </div>
-
-      <!-- Family -->
-      <div class="relative bg-cream rounded-card p-8 md:p-10 shadow-soft2 border-2 border-coral">
-        <span class="absolute -top-3 left-8 bg-coral text-cream small-caps text-[11px] px-3 py-1 rounded-full">Most loved</span>
-        <div class="flex items-baseline justify-between">
-          <h3 class="font-serif text-[28px] tracking-tightish">Family</h3>
-          <span class="small-caps text-coral">7-day free trial</span>
-        </div>
-        <p class="mt-2 text-ink2">For nightly readers and growing libraries.</p>
-        <p class="mt-7 font-serif text-[48px] leading-none tracking-tighter2">$9<span class="text-[18px] text-ink3 font-sans font-normal"> /month</span></p>
-
-        <ul class="mt-8 space-y-3 text-[15px] text-ink">
-          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Unlimited stories</li>
-          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Premium illustration styles</li>
-          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Audio narration</li>
-          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Print and PDF export</li>
-          <li class="flex gap-3"><span class="mt-1 text-coral">✓</span>Multiple child profiles</li>
+      <div class="price-card featured">
+        <div class="price-badge">Most loved</div>
+        <div class="price-name">Family</div>
+        <div class="price-desc">Unlimited stories. 7-day free trial.</div>
+        <div class="price-amt">$9<span> /month</span></div>
+        <ul class="price-list">
+          <li><span class="ck">✓</span> <strong>Unlimited</strong> stories</li>
+          <li><span class="ck">✓</span> Premium illustration styles</li>
+          <li><span class="ck">✓</span> Audio narration</li>
+          <li><span class="ck">✓</span> Print & PDF export</li>
+          <li><span class="ck">✓</span> Multiple child profiles</li>
         </ul>
-
-        <a href="#cta" class="mt-9 btn btn-coral w-full justify-center text-[15px] py-3.5">Try Family free for 7 days</a>
+        <button class="btn btn-gold" onclick="openModal()" style="width:100%;justify-content:center;padding:14px">Try free for 7 days →</button>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px">Cancel anytime. No questions.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="bg-cream2 py-24 md:py-32">
-  <div class="max-w-4xl mx-auto px-6 lg:px-10">
-    <div class="mb-12">
-      <p class="small-caps text-sageDk mb-4">Frequently asked</p>
-      <h2 class="font-serif text-[36px] md:text-[48px] leading-[1.05] tracking-tighter2 text-ink">
-        The questions parents ask first.
-      </h2>
+<section id="faq" class="sec alt">
+  <div class="container-md">
+    <div class="sh">
+      <p class="label">FAQ</p>
+      <h2>Questions parents ask first.</h2>
     </div>
-
-    <div>
+    <div class="faq-list">
       <details class="faq" open>
-        <summary>
-          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Is Hush safe for my child?</span>
-          <span class="plus" aria-hidden="true">
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          </span>
-        </summary>
-        <p class="answer">Every prompt is filtered, every theme age-appropriate. Stories are reviewed against a parent-built guidelines library before reaching your screen.</p>
+        <summary>Is Hush safe for my child?<span class="faq-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <p class="faq-body">Every prompt is filtered. Every theme is age-appropriate. Stories run through a parent-built guidelines library before reaching your screen.</p>
       </details>
-
       <details class="faq">
-        <summary>
-          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">How does the AI actually work?</span>
-          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-        </summary>
-        <p class="answer">Hush uses a fine-tuned story model and an illustration model trained on classic children's book aesthetics. You give the spark, we write the book.</p>
+        <summary>How does the AI work?<span class="faq-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <p class="faq-body">Hush uses a fine-tuned story model and a separate illustration model trained on classic children's book aesthetics. You give us the spark — name, age, interests — and we write a real story around your child.</p>
       </details>
-
       <details class="faq">
-        <summary>
-          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">What ages is Hush for?</span>
-          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-        </summary>
-        <p class="answer">Kids ages 2 through 9. The story length, vocabulary, and themes scale with the age you set.</p>
+        <summary>What ages work best?<span class="faq-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <p class="faq-body">Ages 2–9. Story length, vocabulary, and themes all scale with the age you set. A 2-year-old gets short, rhyming sentences. A 9-year-old gets chapters.</p>
       </details>
-
       <details class="faq">
-        <summary>
-          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Can I edit a story after it's generated?</span>
-          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-        </summary>
-        <p class="answer">Yes. Tap any line to rewrite it, swap illustrations, or regenerate the whole story.</p>
+        <summary>Can I edit the story after it's created?<span class="faq-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <p class="faq-body">Yes. Tap any sentence to rewrite it. Swap illustrations. Or regenerate the whole thing — no extra charge.</p>
       </details>
-
       <details class="faq">
-        <summary>
-          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Is my child's data private?</span>
-          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-        </summary>
-        <p class="answer">Always. We never sell data, never train on your stories, and you can delete everything in one click.</p>
+        <summary>Is my child's data private?<span class="faq-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <p class="faq-body">Always. We never sell data. We never train on your stories. Delete your account and every story in one click.</p>
       </details>
-
       <details class="faq">
-        <summary>
-          <span class="font-serif text-[20px] md:text-[22px] tracking-tightish text-ink">Can I cancel anytime?</span>
-          <span class="plus" aria-hidden="true"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-        </summary>
-        <p class="answer">Yes, no contracts, no questions. Your library stays yours.</p>
+        <summary>Can I cancel anytime?<span class="faq-ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+        <p class="faq-body">Yes. No contracts, no fees, no dark patterns. Your library stays yours forever.</p>
       </details>
     </div>
   </div>
 </section>
 
 <!-- FINAL CTA -->
-<section id="cta" class="bg-coral relative overflow-hidden">
-  <svg class="absolute top-10 right-12 w-6 h-6 text-cream/40 twinkle" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-  <svg class="absolute bottom-12 left-16 w-5 h-5 text-cream/30 twinkle delay-1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
-  <svg class="absolute top-1/3 left-[8%] w-12 h-12 text-cream/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-24 md:py-32 text-center relative">
-    <h2 class="font-serif text-cream text-[44px] md:text-[64px] leading-[1.04] tracking-tighter2 max-w-3xl mx-auto">
-      Tonight's story <span class="italic">is waiting.</span>
-    </h2>
-    <p class="mt-6 text-cream/85 text-[17px] md:text-[19px] max-w-xl mx-auto">
-      Make their first one in under a minute. Free, no credit card.
-    </p>
-    <div class="mt-9">
-      <a href="#" class="btn btn-cream text-[16px]">
-        Create your first story free
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-      </a>
+<section class="sec">
+  <div class="container">
+    <div class="cta-box">
+      <p class="label" style="margin-bottom:10px">✦ Start tonight</p>
+      <h2>Tonight's story<br><em class="serif" style="font-style:italic;color:var(--gold)">is waiting.</em></h2>
+      <p>Make their first story in under a minute. Free, no credit card, no catch.</p>
+      <div class="cta-form">
+        <input id="cta-name" type="text" placeholder="Child's name…" autocomplete="off" onkeydown="if(event.key==='Enter')ctaGo()">
+        <button class="btn btn-gold" onclick="ctaGo()">Create their story →</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:14px">3 free stories/month · No card needed · Ready in 30 sec</p>
     </div>
-    <p class="mt-6 text-cream/70 text-[13.5px]">3 free stories every month. Forever.</p>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="bg-cream pt-20 pb-10">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="grid md:grid-cols-12 gap-10">
-      <div class="md:col-span-4">
-        <div class="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" class="w-5 h-5 text-coral" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-          <span class="font-serif text-[24px] tracking-tightish">Hush</span>
-        </div>
-        <p class="mt-3 font-serif italic text-ink2 max-w-[36ch]">A new bedtime story every night. Starring your child.</p>
-        <p class="mt-6 text-[13.5px] text-ink3">hush.kids</p>
+<footer>
+  <div class="footer-grid">
+    <div class="fcol">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        <span class="serif" style="font-size:20px;font-weight:600;letter-spacing:-.02em">Hush</span>
       </div>
-
-      <div class="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
-        <div>
-          <p class="small-caps text-ink3 mb-4">Product</p>
-          <ul class="space-y-2.5 text-[14.5px] text-ink2">
-            <li><a class="hover:text-ink ulink" href="#how">How it works</a></li>
-            <li><a class="hover:text-ink ulink" href="#examples">Examples</a></li>
-            <li><a class="hover:text-ink ulink" href="#pricing">Pricing</a></li>
-          </ul>
-        </div>
-        <div>
-          <p class="small-caps text-ink3 mb-4">Company</p>
-          <ul class="space-y-2.5 text-[14.5px] text-ink2">
-            <li><a class="hover:text-ink ulink" href="#">About</a></li>
-            <li><a class="hover:text-ink ulink" href="#">Blog</a></li>
-            <li><a class="hover:text-ink ulink" href="#">Press</a></li>
-          </ul>
-        </div>
-        <div>
-          <p class="small-caps text-ink3 mb-4">Support</p>
-          <ul class="space-y-2.5 text-[14.5px] text-ink2">
-            <li><a class="hover:text-ink ulink" href="#">Help</a></li>
-            <li><a class="hover:text-ink ulink" href="#">Contact</a></li>
-            <li><a class="hover:text-ink ulink" href="#">Status</a></li>
-          </ul>
-        </div>
-        <div>
-          <p class="small-caps text-ink3 mb-4">Legal</p>
-          <ul class="space-y-2.5 text-[14.5px] text-ink2">
-            <li><a class="hover:text-ink ulink" href="#">Privacy</a></li>
-            <li><a class="hover:text-ink ulink" href="#">Terms</a></li>
-            <li><a class="hover:text-ink ulink" href="#">Child safety</a></li>
-          </ul>
-        </div>
-      </div>
+      <p style="font-size:14px;color:var(--muted);max-width:28ch;line-height:1.6;font-style:italic">A new bedtime story every night. Starring your child.</p>
+      <p style="font-size:13px;color:var(--muted);margin-top:14px">hush.kids</p>
     </div>
-
-    <div class="mt-16 pt-8 border-t border-ink/[0.08] flex flex-wrap gap-3 items-center justify-between text-[13px] text-ink3">
-      <p>© 2026 Hush. Made with care by parents in Toronto.</p>
-      <p class="font-serif italic">Sweet dreams.</p>
-    </div>
+    <div class="fcol"><h4>Product</h4><ul><li><a href="#how">How it works</a></li><li><a href="#examples">Examples</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
+    <div class="fcol"><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Press</a></li></ul></div>
+    <div class="fcol"><h4>Support</h4><ul><li><a href="#">Help center</a></li><li><a href="#">Contact</a></li><li><a href="#">Status</a></li></ul></div>
+    <div class="fcol"><h4>Legal</h4><ul><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li><li><a href="#">Child safety</a></li></ul></div>
+  </div>
+  <div class="footer-btm">
+    <span>© 2026 Hush. Made by parents in Toronto.</span>
+    <span class="serif" style="font-style:italic">Sweet dreams.</span>
   </div>
 </footer>
 
-<script>
-  // Sticky nav
-  const nav = document.getElementById('nav');
-  const setNav = () => {
-    if (window.scrollY > 12) nav.classList.add('scrolled');
-    else nav.classList.remove('scrolled');
-  };
-  setNav();
-  window.addEventListener('scroll', setNav, { passive: true });
+<!-- MOBILE STICKY BAR -->
+<div class="sticky-bar" id="sticky">
+  <button class="btn btn-outline" onclick="openModal()" style="padding:13px 0;flex:1;justify-content:center">Sign in</button>
+  <button class="btn btn-gold" onclick="openModal()" style="padding:13px 0;flex:2;justify-content:center">Create a story free →</button>
+</div>
 
-  // FAQ single-open accordion
-  document.querySelectorAll('details.faq').forEach((d) => {
-    d.addEventListener('toggle', () => {
-      if (d.open) {
-        document.querySelectorAll('details.faq').forEach((o) => { if (o !== d) o.open = false; });
-      }
-    });
+<!-- MODAL -->
+<div class="modal-wrap" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-x" onclick="closeModal()" aria-label="Close">×</button>
+    <div class="modal-dots">
+      <div class="dot on" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="s1">
+      <p class="label" style="margin-bottom:6px">Step 1 of 3</p>
+      <h3>Who's the hero?</h3>
+      <p class="msub">Their name goes on every page.</p>
+      <span class="mlabel">Child's name</span>
+      <input id="mname" type="text" placeholder="e.g. Mira, Leo, Aria…" autocomplete="off" style="margin-bottom:18px">
+      <span class="mlabel">Age group</span>
+      <div class="age-row">
+        <button class="age-btn" onclick="pickAge(this)">2–3</button>
+        <button class="age-btn" onclick="pickAge(this)">4–5</button>
+        <button class="age-btn" onclick="pickAge(this)">6–7</button>
+        <button class="age-btn" onclick="pickAge(this)">8–9</button>
+      </div>
+      <button class="btn btn-gold" onclick="step(2)" style="width:100%;justify-content:center;padding:15px">Next: What do they love? →</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="s2" style="display:none">
+      <p class="label" style="margin-bottom:6px">Step 2 of 3</p>
+      <h3>What does <span id="s2name">your child</span> love?</h3>
+      <p class="msub">Pick 1–3 things to weave into the story.</p>
+      <div class="tag-grid">
+        <button class="tag-btn" onclick="tog(this)">🦕 Dinosaurs</button>
+        <button class="tag-btn" onclick="tog(this)">🚀 Space</button>
+        <button class="tag-btn" onclick="tog(this)">🧙 Magic</button>
+        <button class="tag-btn" onclick="tog(this)">🦊 Animals</button>
+        <button class="tag-btn" onclick="tog(this)">🌊 Ocean</button>
+        <button class="tag-btn" onclick="tog(this)">🏰 Castles</button>
+        <button class="tag-btn" onclick="tog(this)">🌿 Nature</button>
+        <button class="tag-btn" onclick="tog(this)">🎵 Music</button>
+        <button class="tag-btn" onclick="tog(this)">🤖 Robots</button>
+        <button class="tag-btn" onclick="tog(this)">⚽ Sports</button>
+        <button class="tag-btn" onclick="tog(this)">🍕 Food</button>
+        <button class="tag-btn" onclick="tog(this)">🌈 Colours</button>
+      </div>
+      <div class="modal-row">
+        <button class="btn btn-ghost" onclick="step(1)">← Back</button>
+        <button class="btn btn-gold" onclick="step(3)" style="flex:1;justify-content:center;padding:15px">Next: Tonight's theme →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="s3" style="display:none">
+      <p class="label" style="margin-bottom:6px">Step 3 of 3</p>
+      <h3>Tonight's lesson</h3>
+      <p class="msub">Pick one — or let us surprise you.</p>
+      <div class="theme-list">
+        <button class="theme-btn" onclick="pickTheme(this)"><span>🦁</span> Being brave</button>
+        <button class="theme-btn" onclick="pickTheme(this)"><span>🤝</span> Sharing & kindness</button>
+        <button class="theme-btn" onclick="pickTheme(this)"><span>🌟</span> Believing in yourself</button>
+        <button class="theme-btn" onclick="pickTheme(this)"><span>👋</span> Making new friends</button>
+        <button class="theme-btn" onclick="pickTheme(this)"><span>😴</span> Bedtime is good, actually</button>
+        <button class="theme-btn" onclick="pickTheme(this)"><span>✨</span> Surprise me!</button>
+      </div>
+      <div class="modal-row">
+        <button class="btn btn-ghost" onclick="step(2)">← Back</button>
+        <button class="btn btn-gold" id="genbtn" onclick="generate()" style="flex:1;justify-content:center;padding:15px">Create <span id="genname">their</span> story →</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px">Ready in ~30 seconds · Free to start</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- nav ---
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 12), {passive:true});
+
+// --- star field ---
+const sf = document.getElementById('starfield');
+for (let i = 0; i < 42; i++) {
+  const s = document.createElement('div');
+  const sz = Math.random() * 2.5 + 1;
+  s.className = 'star';
+  s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${(Math.random()*5).toFixed(2)}s;animation-duration:${(3+Math.random()*4).toFixed(2)}s`;
+  sf.appendChild(s);
+}
+
+// --- mobile nav ---
+function toggleNav() {
+  const open = document.getElementById('mnav').classList.toggle('open');
+  document.getElementById('hbg').classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeNav() {
+  document.getElementById('mnav').classList.remove('open');
+  document.getElementById('hbg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// --- sticky bar ---
+const sticky = document.getElementById('sticky');
+window.addEventListener('scroll', () => {
+  sticky.style.transform = scrollY > 60 ? 'translateY(0)' : 'translateY(100%)';
+}, {passive:true});
+
+// --- hero / cta forms ---
+function heroGo() { openModal(document.getElementById('hero-name').value.trim()); }
+function ctaGo()  { openModal(document.getElementById('cta-name').value.trim()); }
+
+// --- modal ---
+function openModal(name) {
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (name) document.getElementById('mname').value = name;
+  step(1);
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function step(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('s'+i).style.display = i===n ? 'block' : 'none';
+    document.getElementById('d'+i).classList.toggle('on', i<=n);
   });
+  if (n===2) document.getElementById('s2name').textContent = document.getElementById('mname').value.trim() || 'your child';
+  if (n===3) {
+    const nm = document.getElementById('mname').value.trim();
+    document.getElementById('genname').textContent = nm ? nm+"'s" : 'their';
+  }
+}
+
+function pickAge(btn) {
+  document.querySelectorAll('.age-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function tog(btn) { btn.classList.toggle('on'); }
+function pickTheme(btn) {
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function generate() {
+  const btn = document.getElementById('genbtn');
+  btn.textContent = '✦ Writing story…';
+  btn.disabled = true; btn.style.opacity = '.7';
+  setTimeout(() => {
+    btn.innerHTML = '🎉 Story ready! Sign up to read it →';
+    btn.disabled = false; btn.style.opacity = '1';
+  }, 2200);
+}
+
+// --- faq single-open ---
+document.querySelectorAll('details.faq').forEach(d => {
+  d.addEventListener('toggle', () => {
+    if (d.open) document.querySelectorAll('details.faq').forEach(o => { if (o!==d) o.open=false; });
+  });
+});
 </script>
 </body>
 </html>
