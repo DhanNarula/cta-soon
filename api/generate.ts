@@ -123,9 +123,10 @@ Writing rules: bedtime tone, ${ageGuide}, "${theme}" emerges naturally (never pr
   return JSON.parse(cleaned);
 }
 
-export default async function handler(req: Request): Promise<Response> {
+export default async function handler(req: any, res: any): Promise<void> {
   if (req.method !== "POST") {
-    return Response.json({ ok: false, error: "Method not allowed" }, { status: 405 });
+    res.status(405).json({ ok: false, error: "Method not allowed" });
+    return;
   }
 
   const GEMINI_KEY = process.env.gemini_api_key;
@@ -134,7 +135,7 @@ export default async function handler(req: Request): Promise<Response> {
     : null;
 
   try {
-    const body = (await req.json()) as {
+    const body = req.body as {
       session_id?: string;
       name?: string;
       age?: string;
@@ -145,10 +146,11 @@ export default async function handler(req: Request): Promise<Response> {
     let name: string, age: string, interests: string[], theme: string;
 
     if (body.session_id) {
-      if (!stripe) return Response.json({ ok: false, error: "Stripe not configured" }, { status: 500 });
+      if (!stripe) { res.status(500).json({ ok: false, error: "Stripe not configured" }); return; }
       const session = await stripe.checkout.sessions.retrieve(body.session_id);
       if (session.payment_status !== "paid") {
-        return Response.json({ ok: false, error: "Payment not completed" }, { status: 402 });
+        res.status(402).json({ ok: false, error: "Payment not completed" });
+        return;
       }
       name = session.metadata?.name || "";
       age = session.metadata?.age || "4–5";
@@ -161,32 +163,29 @@ export default async function handler(req: Request): Promise<Response> {
       theme = body.theme || "";
     }
 
-    if (!name || !theme) return Response.json({ ok: false, error: "Missing fields" }, { status: 400 });
-    if (!GEMINI_KEY) return Response.json({ ok: false, error: "No Gemini API key" }, { status: 500 });
+    if (!name || !theme) { res.status(400).json({ ok: false, error: "Missing fields" }); return; }
+    if (!GEMINI_KEY) { res.status(500).json({ ok: false, error: "No Gemini API key" }); return; }
 
     const interest = interests?.[0] || "Animals";
     const s = SETTINGS[interest] ?? SETTINGS["Animals"];
 
     const storyData = await generateStoryWithScenes(name, age, interests, theme, s, GEMINI_KEY);
 
+    // Generate only the cover image to stay within the 60s function timeout.
+    // Page illustrations are null; app.html renders a themed color background instead.
     const charCtx = `The child hero is ${name}, a young child with wonder-filled eyes. The companion is ${s.fn} (${s.fd}). Setting: ${s.place}.`;
-    const allScenes = [storyData.cover_scene, ...storyData.pages.map((p) => p.scene)];
-
-    const imageResults = await Promise.allSettled(
-      allScenes.map((scene) => generateIllustration(`${charCtx} ${scene}`, GEMINI_KEY)),
-    );
-    const images = imageResults.map((r) => (r.status === "fulfilled" ? r.value : null));
+    const coverImage = await generateIllustration(`${charCtx} ${storyData.cover_scene}`, GEMINI_KEY);
 
     const story = {
       name, age, interests, theme,
       title: storyData.title,
-      coverImage: images[0],
-      pages: storyData.pages.map((p, i) => ({ text: p.text, image: images[i + 1] ?? null })),
+      coverImage,
+      pages: storyData.pages.map((p) => ({ text: p.text, image: null })),
     };
 
-    return Response.json({ ok: true, story });
+    res.json({ ok: true, story });
   } catch (err) {
     console.error("[/api/generate]", err);
-    return Response.json({ ok: false, error: String(err) }, { status: 500 });
+    res.status(500).json({ ok: false, error: String(err) });
   }
 }
