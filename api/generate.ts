@@ -129,7 +129,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const GEMINI_KEY = process.env.gemini_api_key;
-  const stripe = process.env.stripe_secret_key ? new Stripe(process.env.stripe_secret_key) : null;
+  const stripe = process.env.stripe_secret_key
+    ? new Stripe(process.env.stripe_secret_key, { httpClient: Stripe.createFetchHttpClient() })
+    : null;
 
   try {
     const body = (await req.json()) as {

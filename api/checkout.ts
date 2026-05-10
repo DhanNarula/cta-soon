@@ -8,7 +8,9 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const stripe = process.env.stripe_secret_key
-    ? new Stripe(process.env.stripe_secret_key)
+    ? new Stripe(process.env.stripe_secret_key, {
+        httpClient: Stripe.createFetchHttpClient(),
+      })
     : null;
   if (!stripe) return Response.json({ ok: false, error: "Stripe not configured" }, { status: 500 });
 
