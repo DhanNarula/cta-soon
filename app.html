@@ -722,24 +722,7 @@ async function createStory() {
   const age = selectedAge || '4–5';
   const interests = selectedInterests.size > 0 ? [...selectedInterests] : ['Animals'];
   const theme = selectedTheme || 'Being brave';
-
-  const btn = document.getElementById('create-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Setting up…'; }
-
-  try {
-    const resp = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, age, interests, theme }),
-    });
-    const data = await resp.json();
-    if (!data.ok || !data.url) throw new Error(data.error || 'Checkout failed');
-    window.location.href = data.url;
-  } catch (err) {
-    console.error('Checkout error:', err);
-    if (btn) { btn.disabled = false; btn.textContent = '✦ Create My Story'; }
-    alert('Could not start checkout. Please try again.');
-  }
+  _generateDirect(name, age, interests, theme);
 }
 
 async function generateAfterPayment(sessionId) {

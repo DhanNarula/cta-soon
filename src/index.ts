@@ -108,7 +108,7 @@ Writing rules: bedtime tone, ${ageGuide}, "${theme}" emerges naturally (never pr
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 5000, temperature: 0.85 },
+        generationConfig: { maxOutputTokens: 16000, temperature: 0.85 },
       }),
     },
   );

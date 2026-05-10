@@ -109,7 +109,7 @@ Writing rules: bedtime tone, ${ageGuide}, "${theme}" emerges naturally (never pr
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 5000, temperature: 0.85 },
+        generationConfig: { maxOutputTokens: 16000, temperature: 0.85 },
       }),
     },
   );
@@ -171,16 +171,19 @@ export default async function handler(req: any, res: any): Promise<void> {
 
     const storyData = await generateStoryWithScenes(name, age, interests, theme, s, GEMINI_KEY);
 
-    // Generate only the cover image to stay within the 60s function timeout.
-    // Page illustrations are null; app.html renders a themed color background instead.
     const charCtx = `The child hero is ${name}, a young child with wonder-filled eyes. The companion is ${s.fn} (${s.fd}). Setting: ${s.place}.`;
-    const coverImage = await generateIllustration(`${charCtx} ${storyData.cover_scene}`, GEMINI_KEY);
+    const allScenes = [storyData.cover_scene, ...storyData.pages.map((p) => p.scene)];
+
+    const imageResults = await Promise.allSettled(
+      allScenes.map((scene) => generateIllustration(`${charCtx} ${scene}`, GEMINI_KEY)),
+    );
+    const images = imageResults.map((r) => (r.status === "fulfilled" ? r.value : null));
 
     const story = {
       name, age, interests, theme,
       title: storyData.title,
-      coverImage,
-      pages: storyData.pages.map((p) => ({ text: p.text, image: null })),
+      coverImage: images[0],
+      pages: storyData.pages.map((p, i) => ({ text: p.text, image: images[i + 1] ?? null })),
     };
 
     res.json({ ok: true, story });
