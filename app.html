@@ -98,42 +98,100 @@ select option{background:var(--grove)}
 .gen-bar{height:100%;background:var(--gold);border-radius:2px;width:0;transition:width .4s ease}
 .gen-steps-text{font-size:13px;color:var(--muted);height:20px}
 
-/* ── READER ── */
+/* ── READER — full-bleed picture book ── */
 #view-reader{height:calc(100vh - 60px);overflow:hidden}
-#view-reader.active{display:flex;flex-direction:column}
-.reader-top{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
-.reader-title{font-family:'Lora',serif;font-size:16px;font-weight:600;letter-spacing:-.01em;flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.reader-pages{font-size:13px;color:var(--muted);white-space:nowrap}
+#view-reader.active{display:flex;flex-direction:column;background:#0A1810}
 
-.reader-spread{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
-@media(max-width:720px){.reader-spread{grid-template-columns:1fr;grid-template-rows:1fr 1fr}}
+/* Top bar — slim, dark, transparent */
+.reader-top{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;background:rgba(10,24,16,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,168,83,.15)}
+.reader-top .btn-ghost{color:var(--cream)}
+.reader-top .btn-ghost:hover{color:var(--gold)}
+.reader-title{font-family:'Lora',serif;font-size:14px;font-weight:600;color:var(--cream);flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
+.reader-pages{font-size:12px;color:var(--gold);white-space:nowrap;font-weight:700;opacity:.8}
 
-.reader-illo{background:var(--grove);position:relative;overflow:hidden}
-.reader-illo svg{width:100%;height:100%;object-fit:cover}
-.reader-illo .page-num{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,.3);font-family:'Lora',serif;font-style:italic}
+/* Spread — full bleed canvas */
+.reader-spread{flex:1;position:relative;overflow:hidden;transition:opacity .28s ease}
+.reader-spread.fade{opacity:0}
 
-.reader-text{background:var(--forest);border-left:1px solid var(--border);padding:clamp(24px,4vw,52px);display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
-@media(max-width:720px){.reader-text{border-left:none;border-top:1px solid var(--border)}}
-.reader-text .chapter{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
-.reader-text .story-text{font-family:'Lora',serif;font-size:clamp(15px,2vw,19px);line-height:1.75;color:var(--cream);white-space:pre-line}
-.reader-text .story-text em{font-style:italic;color:var(--goldlt)}
+/* Illustration fills entire spread */
+.reader-illo{position:absolute;inset:0;z-index:1;background:#0D1A10}
+.reader-illo img.page-img{width:100%;height:100%;object-fit:cover;display:block}
+.reader-illo svg{width:100%;height:100%}
+/* Wide cinematic gradient — starts halfway up so the image breathes into the text */
+.reader-illo::after{
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,
+    rgba(3,1,0,.85) 0%,
+    rgba(3,1,0,.68) 18%,
+    rgba(3,1,0,.40) 38%,
+    rgba(3,1,0,.12) 55%,
+    transparent 70%);
+}
 
-.reader-nav{padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:20px;border-top:1px solid var(--border);flex-shrink:0}
-.page-dots{display:flex;gap:5px;align-items:center}
-.pdot{width:7px;height:7px;border-radius:50%;background:var(--canopy);transition:background .2s,transform .2s}
-.pdot.on{background:var(--gold);transform:scale(1.3)}
-.reader-actions{position:absolute;bottom:80px;right:20px;display:flex;flex-direction:column;gap:8px}
+/* Text sits on the gradient — no background of its own */
+.reader-text{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:3;
+  width:min(680px,88%);
+  padding:clamp(36px,7vw,90px) 0 clamp(22px,3vw,38px);
+}
+/* Gold rule lines flanking the page label */
+.reader-text .chapter{
+  font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(218,172,84,.8);margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;
+}
+.reader-text .chapter::before,.reader-text .chapter::after{
+  content:'';flex:1;height:1px;background:rgba(218,172,84,.28);
+}
+/* Main story text — strong shadow does the readability work */
+.reader-text .story-text{
+  font-family:'Lora',serif;
+  font-size:clamp(16px,2vw,21px);
+  line-height:1.9;
+  color:#FDF3E2;
+  white-space:pre-line;
+  text-shadow:0 1px 3px rgba(0,0,0,.8), 0 4px 20px rgba(0,0,0,.55);
+  letter-spacing:.008em;
+}
+.reader-text .story-text em{font-style:italic;color:#F2C96A;text-shadow:0 1px 8px rgba(0,0,0,.7)}
+
+/* Cover page — same full-bleed approach */
+.cover-page{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  text-align:center;overflow:hidden
+}
+.cover-page img.cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover-page .cover-bg{position:absolute;inset:0}
+.cover-overlay{
+  position:relative;z-index:2;width:100%;
+  padding:clamp(60px,10vw,120px) clamp(20px,5vw,60px) clamp(20px,3vw,40px);
+  background:linear-gradient(transparent,rgba(5,2,0,.75) 40%,rgba(5,2,0,.92) 65%)
+}
+.cover-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.cover-title{font-family:'Lora',serif;font-size:clamp(20px,4vw,50px);font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.15;margin-bottom:8px;text-shadow:0 2px 28px rgba(0,0,0,.7)}
+.cover-sub{font-family:'Lora',serif;font-style:italic;font-size:clamp(13px,1.6vw,18px);color:#E8C47A;opacity:.9}
+/* SVG cover fallback */
+.cover-page.svg-cover{justify-content:center;padding:40px}
+.cover-page.svg-cover h1{font-family:'Lora',serif;font-size:clamp(28px,5vw,52px);letter-spacing:-.025em;line-height:1.1;margin:16px 0 10px;z-index:1;position:relative}
+.cover-page.svg-cover .cover-sub{font-family:'Lora',serif;font-style:italic;font-size:18px;color:var(--goldlt);z-index:1;position:relative}
+
+/* Navigation bar */
+.reader-nav{padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:20px;flex-shrink:0;background:rgba(10,24,16,.92);backdrop-filter:blur(8px);border-top:1px solid rgba(212,168,83,.12)}
+.page-dots{display:flex;gap:6px;align-items:center}
+.pdot{width:8px;height:8px;border-radius:50%;background:rgba(212,168,83,.25);transition:all .2s;cursor:pointer}
+.pdot.on{background:var(--gold);transform:scale(1.5)}
+.btn-icon{background:rgba(255,255,255,.1);border:1.5px solid rgba(212,168,83,.35);color:var(--cream);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px)}
+.btn-icon:hover:not(:disabled){background:var(--gold);border-color:var(--gold);color:var(--forest);transform:scale(1.08)}
+.btn-icon:disabled{opacity:.18;cursor:default}
+
+/* Floating action buttons */
+.reader-actions{position:absolute;bottom:80px;right:16px;display:flex;flex-direction:column;gap:8px}
 @media(max-width:720px){.reader-actions{position:fixed}}
-.r-action{padding:10px 14px;border-radius:999px;border:1.5px solid var(--border);background:rgba(13,31,22,.9);color:var(--cream);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color .2s,background .2s;white-space:nowrap}
-.r-action:hover{border-color:var(--gold);background:var(--canopy)}
-.reader-wrap{position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.r-action{padding:9px 14px;border-radius:999px;border:1px solid rgba(212,168,83,.3);background:rgba(10,24,16,.8);color:var(--cream);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;backdrop-filter:blur(8px)}
+.r-action:hover{border-color:var(--gold);background:rgba(10,24,16,.95)}
 
-/* cover page */
-.cover-page{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;position:relative;overflow:hidden}
-.cover-page h1{font-family:'Lora',serif;font-size:clamp(28px,5vw,52px);letter-spacing:-.025em;line-height:1.1;margin:16px 0 10px;z-index:1;position:relative}
-.cover-page .cover-sub{font-family:'Lora',serif;font-style:italic;font-size:18px;color:var(--goldlt);z-index:1;position:relative}
-.cover-page .cover-label{z-index:1;position:relative}
-.cover-bg{position:absolute;inset:0}
+.reader-wrap{position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden}
 
 /* page transition */
 .reader-spread{transition:opacity .3s ease}
@@ -159,29 +217,11 @@ select option{background:var(--grove)}
     </a>
     <div style="display:flex;align-items:center;gap:10px">
       <button class="btn btn-ghost" onclick="showView('library')" id="nav-lib-btn">My Library</button>
-      <button class="btn btn-ghost" onclick="openSettings()" id="nav-settings-btn" title="API Settings" style="padding:10px;font-size:20px;line-height:1">⚙</button>
       <button class="btn btn-gold" onclick="showView('creator')" id="nav-create-btn" style="padding:10px 16px;font-size:14px">+ New Story</button>
     </div>
   </div>
 </nav>
 
-<!-- SETTINGS MODAL -->
-<div class="modal-wrap" id="settings-modal" onclick="if(event.target===this)closeSettings()">
-  <div class="modal" role="dialog" aria-modal="true" style="max-width:400px">
-    <button class="modal-x" onclick="closeSettings()" aria-label="Close">×</button>
-    <p class="label" style="margin-bottom:8px">Claude API</p>
-    <h3 style="font-family:'Lora',serif;font-size:22px;margin-bottom:6px">Connect your API key</h3>
-    <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Stories are generated by Claude. Add your Anthropic API key to enable real AI-written stories. It's stored only in your browser.</p>
-    <span style="font-size:12px;font-weight:700;color:var(--gold);display:block;margin-bottom:8px;letter-spacing:.08em">ANTHROPIC API KEY</span>
-    <input type="password" id="api-key-input" placeholder="sk-ant-…" autocomplete="off" style="font-family:monospace;font-size:14px"/>
-    <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
-      <div id="key-status" style="font-size:13px;color:var(--muted);flex:1"></div>
-      <button class="btn btn-ghost" onclick="clearKey()" style="font-size:13px">Clear</button>
-      <button class="btn btn-gold" onclick="saveKey()" style="padding:11px 18px;font-size:14px">Save key</button>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-top:16px;line-height:1.6">No key? Stories still work in <strong style="color:var(--cream)">demo mode</strong> — pre-written templates personalized with your child's name.</p>
-  </div>
-</div>
 
 <!-- LIBRARY -->
 <div class="view active" id="view-library">
@@ -661,94 +701,18 @@ function togglePill(btn) {
 }
 
 // ─────────────────────────────────────────────
-// API KEY MANAGEMENT
+// SERVER-SIDE STORY GENERATION (Gemini via /api/generate)
 // ─────────────────────────────────────────────
-function getApiKey() { return localStorage.getItem('hush_api_key') || ''; }
-function openSettings() {
-  document.getElementById('api-key-input').value = getApiKey();
-  updateKeyStatus();
-  document.getElementById('settings-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSettings() {
-  document.getElementById('settings-modal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function saveKey() {
-  const val = document.getElementById('api-key-input').value.trim();
-  if (val) localStorage.setItem('hush_api_key', val);
-  updateKeyStatus();
-  setTimeout(closeSettings, 800);
-}
-function clearKey() {
-  localStorage.removeItem('hush_api_key');
-  document.getElementById('api-key-input').value = '';
-  updateKeyStatus();
-}
-function updateKeyStatus() {
-  const key = getApiKey();
-  const el = document.getElementById('key-status');
-  if (!el) return;
-  if (key) {
-    el.innerHTML = `<span style="color:var(--green)">✓ Key saved — using Claude AI</span>`;
-  } else {
-    el.innerHTML = `<span style="color:var(--muted)">No key — running in demo mode</span>`;
-  }
-}
-
-// ─────────────────────────────────────────────
-// CLAUDE API CALL
-// ─────────────────────────────────────────────
-async function generateWithClaude(name, age, interests, theme, setting) {
-  const key = getApiKey();
-  if (!key) return null;
-
-  const interestList = interests.join(', ');
-  const prompt = `Write a 6-page children's bedtime story for a child named ${name}, age ${age}, who loves: ${interestList}. The moral/theme is: "${theme}".
-
-The story should take place in "${setting.place}" and feature a character named ${setting.fn} (${setting.fd}).
-
-Return ONLY valid JSON in exactly this format, with no extra text before or after:
-{
-  "title": "Story title (e.g. '${name} and the ...')",
-  "pages": [
-    {"text": "Page 1 text (2-3 short paragraphs, ~120 words). Set the scene, ${name} arrives."},
-    {"text": "Page 2 text. ${name} meets ${setting.fn}."},
-    {"text": "Page 3 text. The challenge or problem appears."},
-    {"text": "Page 4 text. ${name} helps or acts bravely."},
-    {"text": "Page 5 text. Resolution and lesson."},
-    {"text": "Page 6 text. ${name} is home in bed, reflecting warmly. Gentle goodnight ending."}
-  ]
-}
-
-Writing guidelines:
-- Use ${name}'s name naturally, not repetitively
-- Age ${age}: ${age === '2–3' ? 'very simple words, short sentences, rhyme occasionally' : age === '4–5' ? 'simple warm language, some descriptive words' : age === '6–7' ? 'richer vocabulary, slightly longer sentences' : 'full sentences, light chapter-book feel'}
-- Warm, cozy bedtime tone
-- Weave in the interests (${interestList}) naturally into the setting or characters
-- The moral should emerge from the story, not be stated as a lesson until the final page`;
-
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+async function generateViaServer(name, age, interests, theme) {
+  const resp = await fetch('/api/generate', {
     method: 'POST',
-    headers: {
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1800,
-      messages: [{ role: 'user', content: prompt }],
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, age, interests, theme }),
   });
-
-  if (!resp.ok) throw new Error(`API error ${resp.status}`);
+  if (!resp.ok) throw new Error(`Server error ${resp.status}`);
   const data = await resp.json();
-  const raw = data.content[0].text.trim();
-  // strip any markdown fences Claude might add
-  const json = raw.replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'');
-  return JSON.parse(json);
+  if (!data.ok) throw new Error(data.error || 'Generation failed');
+  return data.story;
 }
 
 async function createStory() {
@@ -757,66 +721,147 @@ async function createStory() {
   const age = selectedAge || '4–5';
   const interests = selectedInterests.size > 0 ? [...selectedInterests] : ['Animals'];
   const theme = selectedTheme || 'Being brave';
-  const s = SETTINGS[interests[0]] || SETTINGS['Animals'];
 
+  const btn = document.getElementById('create-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Setting up…'; }
+
+  try {
+    const resp = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, age, interests, theme }),
+    });
+    const data = await resp.json();
+    if (!data.ok || !data.url) throw new Error(data.error || 'Checkout failed');
+    window.location.href = data.url;
+  } catch (err) {
+    console.error('Checkout error:', err);
+    if (btn) { btn.disabled = false; btn.textContent = '✦ Create My Story'; }
+    alert('Could not start checkout. Please try again.');
+  }
+}
+
+async function generateAfterPayment(sessionId) {
   showView('generating');
-  document.getElementById('gen-name-display').textContent = name;
+  document.getElementById('gen-name-display').textContent = '…';
 
-  const hasKey = !!getApiKey();
-  const steps = hasKey
-    ? ['Asking Claude to write…', `Building ${name}'s world…`, 'Crafting each page…', 'Finishing touches…']
-    : ['Picking the perfect setting…', `Sending ${name} on an adventure…`, 'Finding the right words…', 'Adding the finishing touches…'];
-
+  const steps = ['Verifying payment…', 'Dreaming up the world…', 'Writing the adventure…', 'Painting the illustrations…'];
   let pct = 0, si = 0;
   const bar = document.getElementById('gen-bar');
   const statusEl = document.getElementById('gen-status');
 
   const tick = setInterval(() => {
-    pct = Math.min(95, pct + (hasKey ? 4 : 14) + Math.random() * 6);
+    pct = Math.min(92, pct + 3 + Math.random() * 5);
     bar.style.width = pct + '%';
-    if (si < steps.length && pct > si * (hasKey ? 22 : 28)) {
+    if (si < steps.length && pct > si * 22) {
       if (statusEl) statusEl.textContent = steps[si++];
     }
-  }, hasKey ? 600 : 280);
+  }, 700);
 
   try {
-    let storyData = null;
-    if (hasKey) {
-      storyData = await generateWithClaude(name, age, interests, theme, s);
-    }
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'Generation failed');
+    const storyData = data.story;
+
+    const name = storyData.name;
+    const age = storyData.age;
+    const interests = storyData.interests;
+    const theme = storyData.theme;
+    const s = SETTINGS[interests[0]] || SETTINGS['Animals'];
 
     clearInterval(tick);
     bar.style.width = '100%';
+    document.getElementById('gen-name-display').textContent = name;
 
-    if (storyData) {
-      // Claude-generated story
-      currentStory = {
-        id: Date.now().toString(),
-        name, age, interests, theme,
-        title: storyData.title,
-        coverText: `A story for ${name}, age ${age}`,
-        pages: storyData.pages.map((p, i) => ({
-          text: p.text,
-          bg: i === 5 ? 'cozy' : s.bg,
-          phase: i + 1,
-        })),
-        createdAt: Date.now(),
-        setting: s,
-        source: 'claude',
-      };
-    } else {
-      currentStory = buildStory(name, age, interests, theme);
-    }
+    currentStory = {
+      id: Date.now().toString(),
+      name, age, interests, theme,
+      title: storyData.title,
+      coverText: `A story for ${name}, age ${age}`,
+      coverImage: storyData.coverImage || null,
+      pages: storyData.pages.map((p, i) => ({
+        text: p.text,
+        image: p.image || null,
+        bg: i === 5 ? 'cozy' : s.bg,
+        phase: i + 1,
+      })),
+      createdAt: Date.now(),
+      setting: s,
+      source: 'gemini',
+    };
 
     currentPage = 0;
     totalPages = currentStory.pages.length + 1;
     setTimeout(() => openReader(), 400);
   } catch (err) {
     clearInterval(tick);
-    console.error('Claude API error:', err);
-    // Fallback to template
+    console.error('Generation error:', err);
+    bar.style.width = '0%';
+    const msg = String(err).replace('Error: ', '');
+    if (statusEl) statusEl.innerHTML =
+      `<span style="color:#f87171">Error: ${msg}</span><br><br>` +
+      `<button class="btn btn-gold" onclick="generateAfterPayment('${sessionId}')" style="margin-top:8px">Try again</button>` +
+      `&nbsp;<button class="btn btn-ghost" onclick="showView('library')" style="margin-top:8px">Back to library</button>`;
+  }
+}
+
+// kept for direct generation path (no payment), used internally
+async function _generateDirect(name, age, interests, theme) {
+  const s = SETTINGS[interests[0]] || SETTINGS['Animals'];
+
+  showView('generating');
+  document.getElementById('gen-name-display').textContent = name;
+
+  const steps = ['Dreaming up the world…', `Writing ${name}'s adventure…`, 'Painting the illustrations…', 'Putting it all together…'];
+  let pct = 0, si = 0;
+  const bar = document.getElementById('gen-bar');
+  const statusEl = document.getElementById('gen-status');
+
+  const tick = setInterval(() => {
+    pct = Math.min(92, pct + 3 + Math.random() * 5);
+    bar.style.width = pct + '%';
+    if (si < steps.length && pct > si * 22) {
+      if (statusEl) statusEl.textContent = steps[si++];
+    }
+  }, 700);
+
+  try {
+    const storyData = await generateViaServer(name, age, interests, theme);
+
+    clearInterval(tick);
     bar.style.width = '100%';
-    if (statusEl) statusEl.textContent = 'Using demo mode…';
+
+    currentStory = {
+      id: Date.now().toString(),
+      name, age, interests, theme,
+      title: storyData.title,
+      coverText: `A story for ${name}, age ${age}`,
+      coverImage: storyData.coverImage || null,
+      pages: storyData.pages.map((p, i) => ({
+        text: p.text,
+        image: p.image || null,
+        bg: i === 5 ? 'cozy' : s.bg,
+        phase: i + 1,
+      })),
+      createdAt: Date.now(),
+      setting: s,
+      source: 'gemini',
+    };
+
+    currentPage = 0;
+    totalPages = currentStory.pages.length + 1;
+    setTimeout(() => openReader(), 400);
+  } catch (err) {
+    clearInterval(tick);
+    console.error('Generation error:', err);
+    bar.style.width = '100%';
+    if (statusEl) statusEl.textContent = 'Using built-in story…';
     currentStory = buildStory(name, age, interests, theme);
     currentPage = 0;
     totalPages = currentStory.pages.length + 1;
@@ -842,20 +887,34 @@ function renderSpread() {
     if (currentPage === 0) {
       // Cover
       const s = story.setting;
-      spread.innerHTML = `
-        <div class="cover-page" style="background:linear-gradient(160deg,${s.hue},#0D1F16)">
-          <div class="cover-bg">${makeSVG(s.bg, 0, s.accent)}</div>
-          <p class="label cover-label" style="margin-bottom:12px">A Hush original</p>
-          <h1 style="color:${s.accent}">${story.title}</h1>
-          <p class="cover-sub">${story.coverText}</p>
-        </div>`;
+      if (story.coverImage) {
+        spread.innerHTML = `
+          <div class="cover-page">
+            <img class="cover-img" src="${story.coverImage}" alt="Cover">
+            <div class="cover-overlay">
+              <p class="cover-badge">A Hush original</p>
+              <h1 class="cover-title">${story.title}</h1>
+              <p class="cover-sub">${story.coverText}</p>
+            </div>
+          </div>`;
+      } else {
+        spread.innerHTML = `
+          <div class="cover-page svg-cover" style="background:linear-gradient(160deg,${s.hue},#0D1F16)">
+            <div class="cover-bg">${makeSVG(s.bg, 0, s.accent)}</div>
+            <p class="label" style="z-index:1;position:relative;margin-bottom:12px">A Hush original</p>
+            <h1 style="color:${s.accent}">${story.title}</h1>
+            <p class="cover-sub">${story.coverText}</p>
+          </div>`;
+      }
     } else {
       const page = story.pages[currentPage - 1];
       const s = story.setting;
+      const illoHtml = page.image
+        ? `<img class="page-img" src="${page.image}" alt="Illustration for page ${currentPage}">`
+        : `${makeSVG(page.bg, page.phase, s.accent)}<div class="page-num">— ${currentPage} —</div>`;
       spread.innerHTML = `
-        <div class="reader-illo" style="background:${s.hue}">
-          ${makeSVG(page.bg, page.phase, s.accent)}
-          <div class="page-num">— ${currentPage} —</div>
+        <div class="reader-illo" style="${page.image ? '' : 'background:' + s.hue}">
+          ${illoHtml}
         </div>
         <div class="reader-text">
           <p class="chapter">${story.name}'s story · Page ${currentPage}</p>
@@ -909,7 +968,13 @@ function saveCurrentStory() {
   const stories = getStories();
   const exists = stories.find(s => s.id === currentStory.id);
   if (!exists) {
-    stories.unshift(currentStory);
+    // Strip base64 images before saving (too large for localStorage)
+    const toSave = {
+      ...currentStory,
+      coverImage: null,
+      pages: currentStory.pages.map(p => ({ ...p, image: null })),
+    };
+    stories.unshift(toSave);
     setStories(stories);
   }
   const btn = document.getElementById('btn-save');
@@ -966,7 +1031,7 @@ function openSavedStory(id) {
 }
 
 // ─────────────────────────────────────────────
-// KEYBOARD NAV
+// KEYBOARD + TOUCH NAV
 // ─────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   const reader = document.getElementById('view-reader');
@@ -975,21 +1040,29 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') { e.preventDefault(); turnPage(-1); }
 });
 
+let _tx = 0, _ty = 0;
+document.addEventListener('touchstart', e => {
+  if (!document.getElementById('view-reader').classList.contains('active')) return;
+  _tx = e.touches[0].clientX;
+  _ty = e.touches[0].clientY;
+}, {passive: true});
+document.addEventListener('touchend', e => {
+  if (!document.getElementById('view-reader').classList.contains('active')) return;
+  const dx = e.changedTouches[0].clientX - _tx;
+  const dy = e.changedTouches[0].clientY - _ty;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) turnPage(dx < 0 ? 1 : -1);
+}, {passive: true});
+
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
 (function() {
-  // Show API key indicator on settings button
-  const settingsBtn = document.getElementById('nav-settings-btn');
-  if (getApiKey()) {
-    settingsBtn.innerHTML = '⚙ <span style="color:var(--green);font-size:10px;font-weight:700">●</span>';
-    settingsBtn.title = 'API Settings (Claude connected)';
-  }
-
   const params = new URLSearchParams(location.search);
-  const name = params.get('name');
+  const sessionId  = params.get('session_id');
+  const cancelled  = params.get('cancelled');
+  const name       = params.get('name');
   const startCreate = params.get('create');
-  const paramAge = params.get('age');
+  const paramAge   = params.get('age');
   const paramInterests = params.get('interests');
   const paramTheme = params.get('theme');
 
@@ -998,8 +1071,14 @@ document.addEventListener('keydown', e => {
   if (paramTheme) selectedTheme = paramTheme;
   if (name) document.getElementById('c-name').value = name;
 
-  // If the landing page sent all params, skip the wizard and generate immediately
-  if (startCreate !== null && name && paramAge && paramTheme) {
+  if (sessionId) {
+    // Returning from Stripe payment — generate the story
+    generateAfterPayment(sessionId);
+  } else if (cancelled) {
+    // User cancelled payment — go back to library
+    renderLibrary();
+  } else if (startCreate !== null && name && paramAge && paramTheme) {
+    // Landing page sent all params — go to checkout
     createStory();
   } else if (startCreate !== null || name) {
     showView('creator');
