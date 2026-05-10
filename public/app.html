@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Hush — Create your story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --forest:#0D1F16;--grove:#122A1D;--canopy:#1A3A28;--leaf:#2A5040;
+  --gold:#D4A853;--goldlt:#E8C47A;--green:#4ADE80;
+  --cream:#F5EFE0;--muted:#9DB8A8;--faint:rgba(212,168,83,.10);--border:rgba(212,168,83,.18);
+  --r:14px;--rsm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--forest);color:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{text-decoration:none;color:inherit}
+.serif{font-family:'Lora',Georgia,serif}
+.label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.muted{color:var(--muted)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:.45rem;font-family:inherit;font-weight:700;font-size:15px;border-radius:10px;border:none;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,opacity .18s;white-space:nowrap;text-decoration:none}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-gold{background:var(--gold);color:var(--forest);padding:14px 22px;box-shadow:0 4px 20px rgba(212,168,83,.35)}
+.btn-gold:hover:not(:disabled){background:var(--goldlt);box-shadow:0 8px 28px rgba(212,168,83,.5)}
+.btn-outline{background:transparent;color:var(--cream);border:1.5px solid var(--border);padding:12px 20px}
+.btn-outline:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.btn-ghost{background:transparent;color:var(--muted);padding:10px 0;font-size:14px;border:none}
+.btn-ghost:hover{color:var(--cream)}
+.btn-icon{background:var(--canopy);border:1.5px solid var(--border);color:var(--cream);width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,border-color .2s}
+.btn-icon:hover:not(:disabled){background:var(--leaf);border-color:var(--gold)}
+.btn-icon:disabled{opacity:.25;cursor:default}
+
+/* inputs */
+input,select{font-family:inherit;font-size:16px;background:var(--canopy);color:var(--cream);border:1.5px solid var(--border);border-radius:var(--rsm);padding:14px 16px;width:100%;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+input::placeholder{color:var(--muted)}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.15)}
+select option{background:var(--grove)}
+
+/* ── NAV ── */
+#app-nav{position:sticky;top:0;z-index:50;background:rgba(13,31,22,.4);backdrop-filter:blur(0px);border-bottom:1px solid transparent;height:60px;display:flex;align-items:center;padding:0 20px;transition:background .35s ease,backdrop-filter .35s ease,border-color .35s ease,box-shadow .35s ease}
+#app-nav.scrolled{background:rgba(13,31,22,.96);backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--border);box-shadow:0 1px 24px rgba(0,0,0,.3)}
+.nav-inner{width:100%;max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-logo{display:flex;align-items:center;gap:7px}
+
+/* ── VIEWS ── */
+.view{display:none;min-height:calc(100vh - 60px)}
+.view.active{display:block}
+
+/* ── LIBRARY ── */
+#view-library{padding:48px 20px}
+.lib-inner{max-width:1100px;margin:0 auto}
+.lib-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:36px}
+.lib-head h1{font-family:'Lora',serif;font-size:clamp(24px,4vw,40px);letter-spacing:-.02em}
+.story-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.story-card{background:var(--grove);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s}
+.story-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+.card-cover{aspect-ratio:.75/1;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.card-body{padding:16px}
+.card-title{font-family:'Lora',serif;font-size:17px;font-weight:600;line-height:1.3;margin-bottom:4px}
+.card-meta{font-size:12px;color:var(--muted)}
+.empty-lib{text-align:center;padding:80px 20px}
+.empty-lib p{font-size:17px;color:var(--muted);margin:12px 0 28px}
+
+/* ── CREATOR ── */
+#view-creator{padding:40px 20px}
+.creator-inner{max-width:520px;margin:0 auto}
+.creator-inner h2{font-family:'Lora',serif;font-size:clamp(22px,4vw,32px);letter-spacing:-.02em;margin:8px 0 8px}
+.creator-inner .sub{color:var(--muted);font-size:15px;margin-bottom:28px}
+
+/* step progress */
+.steps{display:flex;gap:6px;margin-bottom:32px}
+.sdot{height:4px;border-radius:2px;background:var(--canopy);transition:background .3s;flex:1}
+.sdot.on{background:var(--gold)}
+
+.field-label{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.08em;display:block;margin-bottom:8px}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 24px}
+.pill{padding:9px 15px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.pill:hover,.pill.on{border-color:var(--gold);color:var(--forest);background:var(--gold)}
+.theme-row{display:flex;flex-direction:column;gap:8px;margin:10px 0 24px}
+.theme-item{padding:14px 16px;border-radius:var(--rsm);text-align:left;border:1.5px solid var(--border);background:var(--canopy);color:var(--cream);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
+.theme-item:hover,.theme-item.on{border-color:var(--gold);background:rgba(212,168,83,.1)}
+.creator-btns{display:flex;gap:10px;align-items:center}
+
+/* ── GENERATING ── */
+#view-generating{min-height:calc(100vh - 60px);padding:40px 20px;text-align:center}
+#view-generating.active{display:flex;align-items:center;justify-content:center}
+.gen-inner{max-width:420px}
+.gen-inner h2{font-family:'Lora',serif;font-size:28px;margin:20px 0 8px;letter-spacing:-.02em}
+.gen-inner p{color:var(--muted);font-size:15px;margin-bottom:32px}
+.gen-spinner{width:64px;height:64px;border:3px solid var(--canopy);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-progress{height:4px;background:var(--canopy);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.gen-bar{height:100%;background:var(--gold);border-radius:2px;width:0;transition:width .4s ease}
+.gen-steps-text{font-size:13px;color:var(--muted);height:20px}
+
+/* ── READER — full-bleed picture book ── */
+#view-reader{height:calc(100vh - 60px);overflow:hidden}
+#view-reader.active{display:flex;flex-direction:column;background:#0A1810}
+
+/* Top bar — slim, dark, transparent */
+.reader-top{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;background:rgba(10,24,16,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,168,83,.15)}
+.reader-top .btn-ghost{color:var(--cream)}
+.reader-top .btn-ghost:hover{color:var(--gold)}
+.reader-title{font-family:'Lora',serif;font-size:14px;font-weight:600;color:var(--cream);flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
+.reader-pages{font-size:12px;color:var(--gold);white-space:nowrap;font-weight:700;opacity:.8}
+
+/* Spread — full bleed canvas */
+.reader-spread{flex:1;position:relative;overflow:hidden;transition:opacity .28s ease}
+.reader-spread.fade{opacity:0}
+
+/* Illustration fills entire spread */
+.reader-illo{position:absolute;inset:0;z-index:1;background:#0D1A10}
+.reader-illo img.page-img{width:100%;height:100%;object-fit:cover;display:block}
+.reader-illo svg{width:100%;height:100%}
+/* Wide cinematic gradient — starts halfway up so the image breathes into the text */
+.reader-illo::after{
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,
+    rgba(3,1,0,.85) 0%,
+    rgba(3,1,0,.68) 18%,
+    rgba(3,1,0,.40) 38%,
+    rgba(3,1,0,.12) 55%,
+    transparent 70%);
+}
+
+/* Text sits on the gradient — no background of its own */
+.reader-text{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:3;
+  width:min(680px,88%);
+  padding:clamp(36px,7vw,90px) 0 clamp(22px,3vw,38px);
+}
+/* Gold rule lines flanking the page label */
+.reader-text .chapter{
+  font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(218,172,84,.8);margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;
+}
+.reader-text .chapter::before,.reader-text .chapter::after{
+  content:'';flex:1;height:1px;background:rgba(218,172,84,.28);
+}
+/* Main story text — strong shadow does the readability work */
+.reader-text .story-text{
+  font-family:'Lora',serif;
+  font-size:clamp(16px,2vw,21px);
+  line-height:1.9;
+  color:#FDF3E2;
+  white-space:pre-line;
+  text-shadow:0 1px 3px rgba(0,0,0,.8), 0 4px 20px rgba(0,0,0,.55);
+  letter-spacing:.008em;
+}
+.reader-text .story-text em{font-style:italic;color:#F2C96A;text-shadow:0 1px 8px rgba(0,0,0,.7)}
+
+/* Cover page — same full-bleed approach */
+.cover-page{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  text-align:center;overflow:hidden
+}
+.cover-page img.cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover-page .cover-bg{position:absolute;inset:0}
+.cover-overlay{
+  position:relative;z-index:2;width:100%;
+  padding:clamp(60px,10vw,120px) clamp(20px,5vw,60px) clamp(20px,3vw,40px);
+  background:linear-gradient(transparent,rgba(5,2,0,.75) 40%,rgba(5,2,0,.92) 65%)
+}
+.cover-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.cover-title{font-family:'Lora',serif;font-size:clamp(20px,4vw,50px);font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.15;margin-bottom:8px;text-shadow:0 2px 28px rgba(0,0,0,.7)}
+.cover-sub{font-family:'Lora',serif;font-style:italic;font-size:clamp(13px,1.6vw,18px);color:#E8C47A;opacity:.9}
+/* SVG cover fallback */
+.cover-page.svg-cover{justify-content:center;padding:40px}
+.cover-page.svg-cover h1{font-family:'Lora',serif;font-size:clamp(28px,5vw,52px);letter-spacing:-.025em;line-height:1.1;margin:16px 0 10px;z-index:1;position:relative}
+.cover-page.svg-cover .cover-sub{font-family:'Lora',serif;font-style:italic;font-size:18px;color:var(--goldlt);z-index:1;position:relative}
+
+/* Navigation bar */
+.reader-nav{padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:20px;flex-shrink:0;background:rgba(10,24,16,.92);backdrop-filter:blur(8px);border-top:1px solid rgba(212,168,83,.12)}
+.page-dots{display:flex;gap:6px;align-items:center}
+.pdot{width:8px;height:8px;border-radius:50%;background:rgba(212,168,83,.25);transition:all .2s;cursor:pointer}
+.pdot.on{background:var(--gold);transform:scale(1.5)}
+.btn-icon{background:rgba(255,255,255,.1);border:1.5px solid rgba(212,168,83,.35);color:var(--cream);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px)}
+.btn-icon:hover:not(:disabled){background:var(--gold);border-color:var(--gold);color:var(--forest);transform:scale(1.08)}
+.btn-icon:disabled{opacity:.18;cursor:default}
+
+/* Floating action buttons */
+.reader-actions{position:absolute;bottom:80px;right:16px;display:flex;flex-direction:column;gap:8px}
+@media(max-width:720px){.reader-actions{position:fixed}}
+.r-action{padding:9px 14px;border-radius:999px;border:1px solid rgba(212,168,83,.3);background:rgba(10,24,16,.8);color:var(--cream);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;backdrop-filter:blur(8px)}
+.r-action:hover{border-color:var(--gold);background:rgba(10,24,16,.95)}
+
+.reader-wrap{position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* page transition */
+.reader-spread{transition:opacity .3s ease}
+.reader-spread.fade{opacity:0}
+
+/* settings / generic modal */
+.modal-wrap{position:fixed;inset:0;z-index:200;background:rgba(13,31,22,.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-wrap.open{opacity:1;pointer-events:all}
+.modal{background:var(--grove);border:1.5px solid var(--border);border-radius:20px;padding:32px 28px;width:100%;max-width:460px;transform:translateY(16px);transition:transform .25s;position:relative;max-height:90svh;overflow-y:auto}
+.modal-wrap.open .modal{transform:translateY(0)}
+.modal-x{position:absolute;top:14px;right:14px;background:var(--canopy);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:color .2s}
+.modal-x:hover{color:var(--cream)}
+</style>
+<script type="module" crossorigin src="./app-pac5sw4s.js"></script></head>
+<body>
+
+<!-- NAV -->
+<nav id="app-nav">
+  <div class="nav-inner">
+    <a href="Hush Landing.html" class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <span class="serif" style="font-size:20px;font-weight:600;letter-spacing:-.02em">Hush</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-ghost" onclick="showView('library')" id="nav-lib-btn">My Library</button>
+      <button class="btn btn-gold" onclick="showView('creator')" id="nav-create-btn" style="padding:10px 16px;font-size:14px">+ New Story</button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- LIBRARY -->
+<div class="view active" id="view-library">
+  <div class="lib-inner">
+    <div class="lib-head">
+      <div>
+        <p class="label" style="margin-bottom:6px">Your library</p>
+        <h1>Your stories</h1>
+      </div>
+      <button class="btn btn-gold" onclick="showView('creator')">
+        + Create new story
+      </button>
+    </div>
+    <div class="story-grid" id="story-grid"></div>
+    <div class="empty-lib" id="empty-lib" style="display:none">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);margin:0 auto"><path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"/><path d="M4 17a3 3 0 0 1 3-3h12"/></svg>
+      <p>No stories yet. Make your first one tonight.</p>
+      <button class="btn btn-gold" onclick="showView('creator')">Create your first story →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATOR -->
+<div class="view" id="view-creator">
+  <div class="creator-inner" style="padding-top:40px">
+
+    <!-- Step 1 -->
+    <div id="step1">
+      <div class="steps"><div class="sdot on"></div><div class="sdot"></div><div class="sdot"></div></div>
+      <p class="label" style="margin-bottom:6px">Step 1 of 3</p>
+      <h2>Who's the hero?</h2>
+      <p class="sub">Their name goes on the cover — and every page.</p>
+      <span class="field-label">Child's name</span>
+      <input id="c-name" type="text" placeholder="e.g. Mira, Leo, Aria…" autocomplete="off" style="margin-bottom:20px" onkeydown="if(event.key==='Enter')goStep(2)">
+      <span class="field-label">Age group</span>
+      <div class="pill-row" id="age-pills">
+        <button class="pill" onclick="pickOne(this,'age')">2–3</button>
+        <button class="pill" onclick="pickOne(this,'age')">4–5</button>
+        <button class="pill" onclick="pickOne(this,'age')">6–7</button>
+        <button class="pill" onclick="pickOne(this,'age')">8–9</button>
+      </div>
+      <button class="btn btn-gold" style="width:100%;justify-content:center;padding:15px" onclick="goStep(2)">
+        Next: What do they love? →
+      </button>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="step2" style="display:none">
+      <div class="steps"><div class="sdot on"></div><div class="sdot on"></div><div class="sdot"></div></div>
+      <p class="label" style="margin-bottom:6px">Step 2 of 3</p>
+      <h2>What does <span id="s2name">your child</span> love?</h2>
+      <p class="sub">Pick 1–3 things. They'll show up in the story.</p>
+      <div class="pill-row" id="interest-pills">
+        <button class="pill" onclick="togglePill(this)">🦕 Dinosaurs</button>
+        <button class="pill" onclick="togglePill(this)">🚀 Space</button>
+        <button class="pill" onclick="togglePill(this)">🧙 Magic</button>
+        <button class="pill" onclick="togglePill(this)">🦊 Animals</button>
+        <button class="pill" onclick="togglePill(this)">🌊 Ocean</button>
+        <button class="pill" onclick="togglePill(this)">🏰 Castles</button>
+        <button class="pill" onclick="togglePill(this)">🌿 Nature</button>
+        <button class="pill" onclick="togglePill(this)">🎵 Music</button>
+        <button class="pill" onclick="togglePill(this)">🤖 Robots</button>
+        <button class="pill" onclick="togglePill(this)">⚽ Sports</button>
+        <button class="pill" onclick="togglePill(this)">🍕 Food</button>
+        <button class="pill" onclick="togglePill(this)">🌈 Colours</button>
+      </div>
+      <div class="creator-btns">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-gold" style="flex:1;justify-content:center;padding:15px" onclick="goStep(3)">Next: Tonight's theme →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="step3" style="display:none">
+      <div class="steps"><div class="sdot on"></div><div class="sdot on"></div><div class="sdot on"></div></div>
+      <p class="label" style="margin-bottom:6px">Step 3 of 3</p>
+      <h2>Tonight's lesson</h2>
+      <p class="sub">Pick a theme for the story. Or let us surprise you.</p>
+      <div class="theme-row" id="theme-row">
+        <button class="theme-item" onclick="pickOne(this,'theme')"><span>🦁</span> Being brave</button>
+        <button class="theme-item" onclick="pickOne(this,'theme')"><span>🤝</span> Sharing &amp; kindness</button>
+        <button class="theme-item" onclick="pickOne(this,'theme')"><span>🌟</span> Believing in yourself</button>
+        <button class="theme-item" onclick="pickOne(this,'theme')"><span>👋</span> Making new friends</button>
+        <button class="theme-item" onclick="pickOne(this,'theme')"><span>😴</span> Bedtime is good, actually</button>
+        <button class="theme-item" onclick="pickOne(this,'theme')"><span>✨</span> Surprise me!</button>
+      </div>
+      <div class="creator-btns">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-gold" style="flex:1;justify-content:center;padding:15px" id="create-btn" onclick="createStory()">
+          Write <span id="create-btn-name">their</span> story →
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- GENERATING -->
+<div class="view" id="view-generating">
+  <div class="gen-inner">
+    <div class="gen-spinner"></div>
+    <h2>Writing <span id="gen-name-display" class="serif" style="color:var(--gold)">their</span> story…</h2>
+    <p id="gen-status">Picking the perfect setting…</p>
+    <div class="gen-progress"><div class="gen-bar" id="gen-bar"></div></div>
+    <p style="font-size:12px;color:var(--muted)">Ready in a few seconds</p>
+  </div>
+</div>
+
+<!-- READER -->
+<div class="view" id="view-reader">
+  <div class="reader-top">
+    <button class="btn btn-ghost" onclick="showView('library')" style="flex-shrink:0">← Library</button>
+    <div class="reader-title" id="reader-title-bar">Story</div>
+    <div class="reader-pages" id="reader-page-label">1 / 7</div>
+  </div>
+  <div class="reader-wrap" id="reader-wrap">
+    <div class="reader-spread" id="reader-spread">
+      <!-- filled by JS -->
+    </div>
+    <div class="reader-actions">
+      <button class="r-action" id="btn-save" onclick="saveCurrentStory()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save to library
+      </button>
+      <button class="r-action" onclick="showView('creator')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New story
+      </button>
+    </div>
+  </div>
+  <div class="reader-nav">
+    <button class="btn-icon" id="prev-btn" onclick="turnPage(-1)" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="page-dots" id="page-dots"></div>
+    <button class="btn-icon" id="next-btn" onclick="turnPage(1)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const SETTINGS = {
+  'Dinosaurs': { place:'the Valley of Ancient Echoes', smell:'warm fern and sun-baked stone', fn:'Pip', fd:'a gentle young triceratops with three stubby horns and soft brown eyes', bg:'prehistoric', hue:'#1A3A1A', accent:'#4ADE80' },
+  'Space':     { place:'the Star Garden beyond the last cloud', smell:'cold silver and distant starlight', fn:'Zim', fd:'a tiny astronaut no taller than a boot, with a helmet that glowed soft blue', bg:'space', hue:'#0A0A2A', accent:'#818CF8' },
+  'Magic':     { place:'the Enchanted Wood', smell:'pine needles and sweet smoke', fn:'Pip', fd:'a tiny wizard no bigger than a thumb, with a hat that tilted left', bg:'forest', hue:'#1A2A1A', accent:'#A78BFA' },
+  'Animals':   { place:'Whispering Meadow', smell:'clover and early rain', fn:'Clover', fd:'a russet fox with a white-tipped tail and clever green eyes', bg:'meadow', hue:'#1A2A14', accent:'#86EFAC' },
+  'Ocean':     { place:'the Deep Blue Cove', smell:'salt and something sweet', fn:'Coral', fd:'a sapphire seahorse who moved like a slow, gentle song', bg:'ocean', hue:'#0A1A2A', accent:'#38BDF8' },
+  'Castles':   { place:'Brightstone Castle on the hill', smell:'old stone and candle wax', fn:'Ember', fd:'a small green dragon with wings like autumn leaves', bg:'castle', hue:'#1A1A2A', accent:'#FCD34D' },
+  'Nature':    { place:'the Mossy Creek Forest', smell:'earth and green and wet leaves', fn:'Sage', fd:'a tawny owl with spectacles made from acorn caps', bg:'forest', hue:'#1A2A1A', accent:'#6EE7B7' },
+  'Music':     { place:'the Song Mountains', smell:'cedar and wind', fn:'Melody', fd:'a bluebird with a golden beak who could make stones hum', bg:'mountain', hue:'#1A1A2A', accent:'#F9A8D4' },
+  'Robots':    { place:'Geartown', smell:'warm oil and fresh bread', fn:'Bolt', fd:'a small silver robot with one antenna bent sideways and a wobbly walk', bg:'city', hue:'#1A1A1A', accent:'#67E8F9' },
+  'Sports':    { place:'the Grand Playing Field', smell:'cut grass and afternoon sun', fn:'Dash', fd:'a quick brown rabbit in tiny striped shorts', bg:'meadow', hue:'#1A2A14', accent:'#86EFAC' },
+  'Food':      { place:'the Candy Kitchen', smell:'cinnamon and brown sugar', fn:'Biscuit', fd:'a round baker with floury hands and a hat shaped like a puffed cloud', bg:'kitchen', hue:'#2A1A0A', accent:'#FCD34D' },
+  'Colours':   { place:'Rainbow Ridge', smell:'rain and something like fresh paint', fn:'Prism', fd:'a colour-changing lizard who left rainbow footprints wherever they walked', bg:'rainbow', hue:'#1A0A2A', accent:'#F472B6' },
+};
+
+const THEMES = {
+  'Being brave':           { label:'Being brave',    problem:'was frozen at the edge of a very wobbly rope bridge', action:'took one small step — then another, then another', lesson:"sometimes brave doesn't mean not scared. It means going anyway" },
+  'Sharing & kindness':    { label:'Sharing',        problem:'had only one of the most precious thing — and looked at it sadly', action:'broke it in two and held out half', lesson:"the best things in the world get bigger when you share them" },
+  'Believing in yourself': { label:'Believing',      problem:"didn't believe they could manage it alone", action:'tried — and then tried again, harder', lesson:"you can do hard things. Especially when you decide to believe you can" },
+  'Making new friends':    { label:'New friends',    problem:'was new and sitting very quietly alone, watching everyone else', action:'walked over and said hello first, heart beating like a drum', lesson:"a stranger is just a friend whose story hasn't started yet" },
+  'Bedtime is good, actually': { label:'Bedtime',   problem:"was fighting sleep with everything they had — eyes wide, brain busy", action:'finally let their eyes flutter closed', lesson:"sleep is where the next adventure lives" },
+  "Surprise me!":          { label:'Adventure',     problem:"wasn't sure which path to take — both looked wonderful and strange", action:'followed their heart and took the first step', lesson:"the best adventures start with a single step you weren't sure about" },
+};
+
+// ─────────────────────────────────────────────
+// STORY GENERATOR
+// ─────────────────────────────────────────────
+function buildStory(name, age, interests, theme) {
+  const interest = (interests && interests.length > 0) ? interests[0] : 'Animals';
+  const s = SETTINGS[interest] || SETTINGS['Animals'];
+  const t = THEMES[theme] || THEMES['Being brave'];
+  const young = age === '2–3' || age === '4–5';
+
+  const fn = s.fn;
+  const fd = s.fd;
+  const place = s.place;
+  const smell = s.smell;
+
+  const titles = [
+    `${name} and the ${fn === 'Pip' ? 'Little Wizard' : fn === 'Coral' ? 'Sapphire Cove' : fn === 'Ember' ? 'Small Dragon' : fn === 'Clover' ? 'Fox at Dusk' : fn + "'s Secret"}`,
+    `${name} Visits ${place}`,
+    `The Night ${name} Met ${fn}`,
+  ];
+  const title = titles[Math.floor(Math.random() * titles.length)];
+
+  const coverText = `A story for ${name}, age ${age}`;
+
+  // Generate the 6 story pages
+  const pages = [
+    {
+      text: `${name} had heard about ${place} for as long as they could remember.\n\nThe night it finally appeared — shimmering softly at the end of the garden path — ${name} didn't hesitate. They pulled on boots, took one deep breath of the night air, which smelled of ${smell}, and stepped through.\n\nThe stars seemed closer here. Like they wanted to listen.`,
+      bg: s.bg,
+      phase: 1,
+    },
+    {
+      text: `${name} had only gone a little way when they heard a small sound — something between a sigh and a hum.\n\nThere, beside a mossy stone, sat ${fn}: ${fd}.\n\n"Hello," said ${name} carefully.\n\n${fn} looked up. "Hello," said ${fn}, and smiled. But the smile was only half-there — and ${name} could see that something was not quite right.`,
+      bg: s.bg,
+      phase: 2,
+    },
+    {
+      text: `"What's the matter?" asked ${name}.\n\n${fn} looked at the ground. "${fn} ${t.problem}. I've been sitting here trying to work up the courage for a long time now."\n\n${name}'s heart beat a little faster. They knew that feeling — the wobbly, uncertain, what-if-I-can't feeling. It was not a comfortable feeling at all.\n\nBut ${name} looked at ${fn}. And ${name} did not walk away.`,
+      bg: s.bg,
+      phase: 3,
+    },
+    {
+      text: `"I'll help," said ${name} quietly. "We can do it together."\n\n${fn}'s eyes brightened. Ears lifted.\n\nAnd so ${name} and ${fn} ${t.action}.\n\nIt wasn't easy. There were moments when ${name}'s hands shook and ${fn}'s breath came in small nervous puffs. But they kept going — one small, brave moment at a time.`,
+      bg: s.bg,
+      phase: 4,
+    },
+    {
+      text: `When it was done, ${fn} turned to ${name} with the biggest, most complete smile ${name} had ever seen.\n\n"I didn't think I could," said ${fn}, a little breathless.\n\n"You could," said ${name}. "You just needed someone beside you."\n\nThe stars in ${place} glowed a little warmer then. The air still smelled of ${smell}. But now it felt like something good and true had been added to it.`,
+      bg: s.bg,
+      phase: 5,
+    },
+    {
+      text: `Later, tucked up in bed, ${name} thought about ${fn} — and about the moment they had reached out their hand.\n\n${name} understood something then. Something warm, something real:\n\n"${t.lesson.charAt(0).toUpperCase() + t.lesson.slice(1)}."\n\n${name} closed their eyes.\n\nAnd smiled all the way to sleep.`,
+      bg: 'cozy',
+      phase: 6,
+    },
+  ];
+
+  return { id: Date.now().toString(), name, age, interests, theme, title, coverText, pages, createdAt: Date.now(), setting: s };
+}
+
+// ─────────────────────────────────────────────
+// SVG ILLUSTRATIONS
+// ─────────────────────────────────────────────
+function makeSVG(bgType, phase, accent) {
+  const a = accent || '#D4A853';
+  // shared elements
+  const stars = Array.from({length:18},(_,i)=>`<circle cx="${10+(i*70)%380}" cy="${8+(i*43)%90}" r="${i%4===0?2:1.2}" fill="${a}" opacity="${.25+.5*((i%5)/5)}"><animate attributeName="opacity" values="${.2+.3*((i%3)/3)};${.7+.2*((i%5)/5)};${.2+.3*((i%3)/3)}" dur="${2.5+(i%4)}s" repeatCount="indefinite"/></circle>`).join('');
+  const moon = `<circle cx="340" cy="55" r="32" fill="${a}" opacity=".8"/><circle cx="350" cy="48" r="28" fill="#0D1F16" opacity=".25"/>`;
+
+  if (bgType === 'space') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="sg" cx="50%" cy="40%" r="70%"><stop offset="0%" stop-color="#0a0a2a"/><stop offset="100%" stop-color="#020210"/></radialGradient></defs>
+    <rect width="480" height="360" fill="url(#sg)"/>
+    ${Array.from({length:35},(_,i)=>`<circle cx="${(i*59+17)%470}" cy="${(i*41+11)%340}" r="${i%5===0?2.5:1.2}" fill="${a}" opacity="${.15+.6*((i%7)/7)}"><animate attributeName="opacity" values="${.1+.2*((i%4)/4)};${.6+.3*((i%6)/6)};${.1+.2*((i%4)/4)}" dur="${3+(i%5)}s" repeatCount="indefinite"/></circle>`).join('')}
+    <circle cx="380" cy="70" r="40" fill="#1a1a4a" opacity=".85"/>
+    <ellipse cx="380" cy="70" rx="56" ry="14" fill="none" stroke="#4a6aaa" stroke-width="2.5" opacity=".5"/>
+    <circle cx="100" cy="280" r="18" fill="#2a1a4a" opacity=".7"/>
+    <path d="M0 280 Q240 240 480 270 L480 360 L0 360Z" fill="#060620"/>
+    ${Array.from({length:14},(_,i)=>`<circle cx="${20+i*32}" cy="${285+(i%3)*6}" r="${2+i%3}" fill="${a}" opacity=".4"><animate attributeName="opacity" values=".2;.8;.2" dur="${2+(i%4)}s" repeatCount="indefinite"/></circle>`).join('')}
+    <ellipse cx="240" cy="265" rx="30" ry="8" fill="${a}" opacity=".15"/>
+    <rect x="228" y="244" width="24" height="22" rx="3" fill="#e8e8f8" opacity=".8"/>
+    <circle cx="240" cy="242" r="12" fill="#e8e8f8" opacity=".9"/>
+    <rect x="235" y="238" width="3" height="6" fill="${a}" opacity=".8"/>
+  </svg>`;
+
+  if (bgType === 'ocean') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="og" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a2a"/><stop offset="100%" stop-color="#041428"/></linearGradient></defs>
+    <rect width="480" height="360" fill="url(#og)"/>
+    ${stars}${moon}
+    <path d="M0 170 Q80 145 160 165 T320 155 T480 168 L480 360 L0 360Z" fill="#062040" opacity=".7"/>
+    <path d="M0 185 Q100 165 200 180 T400 170 T480 180 L480 360 L0 360Z" fill="#082850"/>
+    ${Array.from({length:20},(_,i)=>`<circle cx="${15+(i*47)%450}" cy="${200+(i*29)%140}" r="${1+(i%3)}" fill="${a}" opacity="${.08+.12*((i%5)/5)}"/>`).join('')}
+    <path d="M260 220 Q270 200 280 220 Q290 240 300 220 Q310 200 280 190 Q260 185 255 210Z" fill="#38bdf8" opacity=".5"/>
+    <path d="M280 220 L285 260 M275 230 L265 250 M285 230 L295 250" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+    <circle cx="280" cy="280" r="3" fill="#38bdf8" opacity=".6"/>
+    ${Array.from({length:10},(_,i)=>`<ellipse cx="${50+(i*43)%380}" cy="${215+(i*17)%120}" rx="${2+i%4}" ry="${1+i%3}" fill="none" stroke="${a}" stroke-width="1" opacity=".15"/>`).join('')}
+  </svg>`;
+
+  if (bgType === 'city') {
+    const buildingXs = [40,90,150,200,260,310,370,420];
+    const buildings = buildingXs.map(function(x, i) {
+      const w = 30 + i%3*10, h = 200 - i%4*20, y = 100 + i%4*30;
+      const windows = [0,1,2,3].map(function(j) {
+        const wx = x + 4 + j%2*12, wy = 110 + i%4*30 + j*18;
+        const op = (i+j)%2 === 0 ? '.6' : '.15';
+        return '<rect x="' + wx + '" y="' + wy + '" width="8" height="10" fill="' + a + '" opacity="' + op + '"/>';
+      }).join('');
+      return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#1a1a1a"/>' + windows;
+    }).join('');
+    const streetDots = [0,1,2,3,4,5].map(function(i){ return '<circle cx="' + (60+i*70) + '" cy="295" r="3" fill="' + a + '" opacity=".4"/>'; }).join('');
+    return '<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#111111"/><stop offset="100%" stop-color="#0a0a0a"/></linearGradient></defs>'
+      + '<rect width="480" height="360" fill="url(#cg)"/>'
+      + stars + moon
+      + buildings
+      + '<path d="M0 295 L480 295 L480 360 L0 360Z" fill="#111"/>'
+      + '<circle cx="220" cy="280" r="8" fill="#67e8f9" opacity=".9"/>'
+      + '<rect x="215" y="288" width="10" height="14" rx="2" fill="#67e8f9" opacity=".8"/>'
+      + '<rect x="218" y="284" width="2" height="5" fill="' + a + '" opacity=".9"/>'
+      + streetDots
+      + '</svg>';
+  }
+
+  if (bgType === 'kitchen') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <rect width="480" height="360" fill="#1a0f0a"/>
+    <rect width="480" height="200" fill="#1f1408"/>
+    <rect x="0" y="200" width="480" height="20" fill="#3a2010"/>
+    <rect x="20" y="60" width="160" height="120" rx="4" fill="#2a1808" stroke="#3a2810" stroke-width="2"/>
+    <rect x="300" y="40" width="140" height="140" rx="4" fill="#2a1808" stroke="#3a2810" stroke-width="2"/>
+    ${Array.from({length:4},(_,i)=>`<rect x="${30+i*38}" y="${70}" width="30" height="40" rx="2" fill="${i%2===0?'#fcd34d':'#f97316'}" opacity=".7"/>`).join('')}
+    <ellipse cx="240" cy="220" rx="80" ry="15" fill="#fcd34d" opacity=".2"/>
+    <ellipse cx="240" cy="210" rx="35" ry="35" fill="#fcd34d" opacity=".35"/>
+    <circle cx="240" cy="205" r="28" fill="#fef3c7" opacity=".8"/>
+    <circle cx="245" cy="200" r="5" fill="#d4a853" opacity=".8"/>
+    <path d="M210 240 Q240 220 270 240" fill="#3a2010" stroke="#3a2010" stroke-width="4"/>
+    <ellipse cx="240" cy="240" rx="40" ry="8" fill="#2a1808"/>
+    ${Array.from({length:8},(_,i)=>`<circle cx="${20+(i*60)%450}" cy="${20+(i*30)%60}" r="${i%3===0?3:1.5}" fill="${a}" opacity="${.3+.4*((i%5)/5)}"/>`).join('')}
+  </svg>`;
+
+  if (bgType === 'mountain') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0a1a"/><stop offset="100%" stop-color="#1a0a1a"/></linearGradient></defs>
+    <rect width="480" height="360" fill="url(#mg)"/>
+    ${stars}${moon}
+    <path d="M-10 360 L80 160 L170 360Z" fill="#1a1a2a"/>
+    <path d="M100 360 L240 100 L380 360Z" fill="#121228"/>
+    <path d="M300 360 L420 180 L500 360Z" fill="#1a1a2a"/>
+    <path d="M200 280 Q240 260 280 280 L280 360 L200 360Z" fill="#0f0f20"/>
+    ${['♪','♫','♩','♬'].map((n,i)=>`<text x="${80+i*90}" y="${150+i%3*30}" font-size="${18+i%3*6}" fill="${a}" opacity="${.2+.2*(i%4)/4}" font-family="serif">${n}</text>`).join('')}
+    <circle cx="240" cy="290" r="6" fill="#f9a8d4" opacity=".8"/>
+    <ellipse cx="240" cy="304" rx="4" ry="10" fill="#f9a8d4" opacity=".7"/>
+    <path d="M234 294 Q226 285 222 275 M246 294 Q254 285 258 275" stroke="#f9a8d4" stroke-width="1.5" fill="none" opacity=".7"/>
+  </svg>`;
+
+  if (bgType === 'rainbow') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <rect width="480" height="360" fill="#1a0a2a"/>
+    ${stars}${moon}
+    ${['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6'].map((c,i)=>`<path d="M10 340 Q240 ${80+i*30} 470 340" fill="none" stroke="${c}" stroke-width="${8-i}" opacity="${.2+.15*i}"/>`).join('')}
+    <path d="M0 280 Q240 240 480 270 L480 360 L0 360Z" fill="#0d0a1a"/>
+    ${Array.from({length:12},(_,i)=>`<circle cx="${20+i*40}" cy="${290+i%3*8}" r="${3+i%3}" fill="${['#ef4444','#eab308','#22c55e','#3b82f6','#8b5cf6','#f97316'][i%6]}" opacity=".5"/>`).join('')}
+    <circle cx="240" cy="295" r="5" fill="#f472b6" opacity=".8"/>
+    <path d="M234 295 Q228 285 224 280 M246 295 Q252 285 256 280" stroke="#f472b6" stroke-width="2" fill="none"/>
+    <ellipse cx="240" cy="300" rx="6" ry="12" fill="#f472b6" opacity=".7"/>
+  </svg>`;
+
+  if (bgType === 'castle') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="ck" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0a1f"/><stop offset="100%" stop-color="#1a1a0a"/></linearGradient></defs>
+    <rect width="480" height="360" fill="url(#ck)"/>
+    ${stars}${moon}
+    <rect x="160" y="120" width="160" height="180" fill="#1a1a2a"/>
+    <rect x="155" y="100" width="40" height="80" fill="#1a1a2a"/>
+    <rect x="285" y="100" width="40" height="80" fill="#1a1a2a"/>
+    ${[155,175,285,305].map(x=>`<rect x="${x}" y="85" width="10" height="18"/><rect x="${x+15}" y="85" width="10" height="18"/>`).join('')}
+    <rect x="200" y="220" width="80" height="80" fill="#0f0f1a"/>
+    <path d="M180 360 Q240 330 300 360" fill="#fcd34d" opacity=".15"/>
+    ${Array.from({length:6},(_,i)=>`<rect x="${170+i*12}" y="${130+i%3*20}" width="8" height="12" fill="#fcd34d" opacity="${i%2===0?.6:.2}"/>`).join('')}
+    <path d="M290 200 Q310 180 320 170 Q325 200 290 220Z" fill="#4ade80" opacity=".6"/>
+    <circle cx="290" cy="168" r="8" fill="#4ade80" opacity=".8"/>
+    <path d="M0 300 Q240 270 480 295 L480 360 L0 360Z" fill="#100f1a"/>
+  </svg>`;
+
+  if (bgType === 'prehistoric') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="pg" cx="50%" cy="30%" r="80%"><stop offset="0%" stop-color="#1a3a1a"/><stop offset="100%" stop-color="#0a1f0a"/></radialGradient></defs>
+    <rect width="480" height="360" fill="url(#pg)"/>
+    ${stars}${moon}
+    <ellipse cx="80" cy="110" rx="24" ry="70" fill="#0d2a0d"/>
+    <ellipse cx="100" cy="95" rx="30" ry="50" fill="#0d2a0d"/>
+    <ellipse cx="370" cy="120" rx="20" ry="60" fill="#0d2a0d"/>
+    <ellipse cx="390" cy="105" rx="26" ry="44" fill="#0d2a0d"/>
+    <path d="M0 240 Q120 200 240 220 T480 230 L480 360 L0 360Z" fill="#0a1f0a"/>
+    <path d="M0 265 Q120 245 240 255 T480 250 L480 360 L0 360Z" fill="#071408"/>
+    <path d="M0 290 Q80 280 0 290" fill="#4ade80" opacity=".12"/>
+    ${Array.from({length:8},(_,i)=>`<path d="M${40+i*56} 265 Q${46+i*56} 240 ${52+i*56} 265 Q${58+i*56} 240 ${64+i*56} 265" fill="none" stroke="#2a5a2a" stroke-width="${2+i%2}"/>`).join('')}
+    <path d="M200 235 Q215 195 235 190 Q248 175 260 188 Q275 182 280 198 Q292 204 286 222 Q278 240 260 242 Z" fill="#0a1a0a" opacity=".85"/>
+    <path d="M260 182 L268 168 M250 178 L255 163 M240 184 L243 170" stroke="#0a1a0a" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="215" cy="212" r="3" fill="#4ade80" opacity=".5"/>
+  </svg>`;
+
+  if (bgType === 'cozy') return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <rect width="480" height="360" fill="#0a1208"/>
+    <rect x="20" y="30" width="440" height="280" rx="8" fill="#122018"/>
+    <rect x="50" y="50" width="380" height="230" rx="4" fill="#0d1a10"/>
+    <rect x="160" y="10" width="160" height="45" rx="4" fill="#1a3020"/>
+    <rect x="60" y="220" width="360" height="20" rx="4" fill="#1a3020"/>
+    <rect x="80" y="240" width="320" height="60" rx="4" fill="#0f2018"/>
+    <rect x="100" y="242" width="120" height="56" rx="3" fill="#1a3020"/>
+    <rect x="260" y="242" width="120" height="56" rx="3" fill="#1a3020"/>
+    <rect x="40" y="50" width="10" height="240" rx="2" fill="#1a3020"/>
+    <rect x="430" y="50" width="10" height="240" rx="2" fill="#1a3020"/>
+    <rect x="290" y="60" width="120" height="90" rx="4" fill="#1a2818" stroke="${a}" stroke-width="1.5"/>
+    ${stars.replace(/cx="\d+"/g,m=>`cx="${parseInt(m.slice(4))*0.3+295}"`).replace(/cy="\d+"/g,m=>`cy="${parseInt(m.slice(4))*0.8+65}"`)}
+    <circle cx="345" cy="88" r="16" fill="${a}" opacity=".7"/>
+    <circle cx="350" cy="84" r="13" fill="#1a2818" opacity=".4"/>
+    <circle cx="200" cy="188" r="28" fill="#122018"/>
+    <ellipse cx="200" cy="188" rx="28" ry="22" fill="#1a3020"/>
+    <ellipse cx="200" cy="192" rx="24" ry="10" fill="#0f2018"/>
+    <path d="M186 182 Q200 174 214 182" fill="none" stroke="${a}" stroke-width="1.5" opacity=".6"/>
+    <circle cx="194" cy="186" r="2" fill="${a}" opacity=".7"/>
+    <circle cx="206" cy="186" r="2" fill="${a}" opacity=".7"/>
+    <path d="M196 194 Q200 198 204 194" fill="none" stroke="${a}" stroke-width="1.5"/>
+    <path d="M172 175 L165 160 M228 175 L235 160" stroke="#1a3020" stroke-width="4" stroke-linecap="round"/>
+  </svg>`;
+
+  // default: forest/meadow
+  return `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="fg" cx="40%" cy="30%" r="80%"><stop offset="0%" stop-color="#122a1d"/><stop offset="100%" stop-color="#071408"/></radialGradient></defs>
+    <rect width="480" height="360" fill="url(#fg)"/>
+    ${stars}${moon}
+    <rect x="40" y="100" width="14" height="180" fill="#071408"/>
+    <ellipse cx="47" cy="95" rx="42" ry="60" fill="#0a1f0a"/>
+    <rect x="370" y="120" width="12" height="160" fill="#071408"/>
+    <ellipse cx="376" cy="115" rx="35" ry="50" fill="#0a1f0a"/>
+    <rect x="160" y="150" width="10" height="140" fill="#071408"/>
+    <ellipse cx="165" cy="145" rx="28" ry="40" fill="#0a1f0a"/>
+    <path d="M0 260 Q120 235 240 248 T480 255 L480 360 L0 360Z" fill="#0a1f0a"/>
+    <path d="M0 280 Q120 265 240 272 T480 270 L480 360 L0 360Z" fill="#071408"/>
+    ${Array.from({length:10},(_,i)=>`<path d="M${30+i*46} 280 Q${36+i*46} 258 ${42+i*46} 280" fill="none" stroke="#1a3a1a" stroke-width="${1.5+i%2}"/>`).join('')}
+    <path d="M224 258 Q236 236 248 254 Q256 240 264 256 Q272 244 260 230 Q248 220 236 228 Q220 224 216 238 Z" fill="#0a1a0a" opacity=".85"/>
+    <circle cx="230" cy="272" r="3" fill="${a}" opacity=".5"/>
+  </svg>`;
+}
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentStory = null;
+let currentPage = 0; // 0 = cover
+let totalPages = 0;
+let selectedAge = '';
+let selectedInterests = new Set();
+let selectedTheme = '';
+
+// ─────────────────────────────────────────────
+// VIEW MANAGEMENT
+// ─────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (name === 'library') renderLibrary();
+}
+
+// ─────────────────────────────────────────────
+// CREATOR
+// ─────────────────────────────────────────────
+function goStep(n) {
+  if (n === 2) {
+    const nameEl = document.getElementById('c-name');
+    const name = nameEl.value.trim();
+    if (!name) {
+      nameEl.style.borderColor = '#ef4444';
+      nameEl.style.boxShadow = '0 0 0 3px rgba(239,68,68,.2)';
+      nameEl.placeholder = 'Please enter a name first!';
+      nameEl.focus();
+      setTimeout(() => {
+        nameEl.style.borderColor = '';
+        nameEl.style.boxShadow = '';
+        nameEl.placeholder = 'e.g. Mira, Leo, Aria…';
+      }, 2000);
+      return;
+    }
+    document.getElementById('s2name').textContent = name;
+    const cbname = document.getElementById('create-btn-name');
+    if (cbname) cbname.textContent = name + "'s";
+  }
+  if (n === 3) {
+    const name = document.getElementById('c-name').value.trim();
+    const el = document.getElementById('create-btn-name');
+    if (el) el.textContent = name ? name + "'s" : "their";
+  }
+  [1,2,3].forEach(i => {
+    document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+  });
+}
+
+function pickOne(btn, group) {
+  const container = btn.closest('.pill-row') || btn.closest('.theme-row') || btn.closest('.creator-inner');
+  if (container) container.querySelectorAll('.' + (group === 'age' ? 'pill' : 'theme-item')).forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  // strip leading emoji + space so lookup keys match
+  const rawText = btn.textContent.trim().replace(/^[\p{Emoji}\s]+\s/u, '').trim();
+  if (group === 'age') selectedAge = btn.textContent.trim();
+  if (group === 'theme') selectedTheme = rawText;
+}
+
+function togglePill(btn) {
+  btn.classList.toggle('on');
+  const val = btn.textContent.trim().replace(/^[\p{Emoji}\s]+\s/u, '').trim();
+  if (btn.classList.contains('on')) selectedInterests.add(val);
+  else selectedInterests.delete(val);
+}
+
+// ─────────────────────────────────────────────
+// SERVER-SIDE STORY GENERATION (Gemini via /api/generate)
+// ─────────────────────────────────────────────
+async function generateViaServer(name, age, interests, theme) {
+  const resp = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, age, interests, theme }),
+  });
+  if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+  const data = await resp.json();
+  if (!data.ok) throw new Error(data.error || 'Generation failed');
+  return data.story;
+}
+
+async function createStory() {
+  const name = document.getElementById('c-name').value.trim();
+  if (!name) { goStep(1); return; }
+  const age = selectedAge || '4–5';
+  const interests = selectedInterests.size > 0 ? [...selectedInterests] : ['Animals'];
+  const theme = selectedTheme || 'Being brave';
+
+  const btn = document.getElementById('create-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Setting up…'; }
+
+  try {
+    const resp = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, age, interests, theme }),
+    });
+    const data = await resp.json();
+    if (!data.ok || !data.url) throw new Error(data.error || 'Checkout failed');
+    window.location.href = data.url;
+  } catch (err) {
+    console.error('Checkout error:', err);
+    if (btn) { btn.disabled = false; btn.textContent = '✦ Create My Story'; }
+    alert('Could not start checkout. Please try again.');
+  }
+}
+
+async function generateAfterPayment(sessionId) {
+  showView('generating');
+  document.getElementById('gen-name-display').textContent = '…';
+
+  const steps = ['Verifying payment…', 'Dreaming up the world…', 'Writing the adventure…', 'Painting the illustrations…'];
+  let pct = 0, si = 0;
+  const bar = document.getElementById('gen-bar');
+  const statusEl = document.getElementById('gen-status');
+
+  const tick = setInterval(() => {
+    pct = Math.min(92, pct + 3 + Math.random() * 5);
+    bar.style.width = pct + '%';
+    if (si < steps.length && pct > si * 22) {
+      if (statusEl) statusEl.textContent = steps[si++];
+    }
+  }, 700);
+
+  try {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error || 'Generation failed');
+    const storyData = data.story;
+
+    const name = storyData.name;
+    const age = storyData.age;
+    const interests = storyData.interests;
+    const theme = storyData.theme;
+    const s = SETTINGS[interests[0]] || SETTINGS['Animals'];
+
+    clearInterval(tick);
+    bar.style.width = '100%';
+    document.getElementById('gen-name-display').textContent = name;
+
+    currentStory = {
+      id: Date.now().toString(),
+      name, age, interests, theme,
+      title: storyData.title,
+      coverText: `A story for ${name}, age ${age}`,
+      coverImage: storyData.coverImage || null,
+      pages: storyData.pages.map((p, i) => ({
+        text: p.text,
+        image: p.image || null,
+        bg: i === 5 ? 'cozy' : s.bg,
+        phase: i + 1,
+      })),
+      createdAt: Date.now(),
+      setting: s,
+      source: 'gemini',
+    };
+
+    currentPage = 0;
+    totalPages = currentStory.pages.length + 1;
+    setTimeout(() => openReader(), 400);
+  } catch (err) {
+    clearInterval(tick);
+    console.error('Generation error:', err);
+    bar.style.width = '0%';
+    const msg = String(err).replace('Error: ', '');
+    if (statusEl) statusEl.innerHTML =
+      `<span style="color:#f87171">Error: ${msg}</span><br><br>` +
+      `<button class="btn btn-gold" onclick="generateAfterPayment('${sessionId}')" style="margin-top:8px">Try again</button>` +
+      `&nbsp;<button class="btn btn-ghost" onclick="showView('library')" style="margin-top:8px">Back to library</button>`;
+  }
+}
+
+// kept for direct generation path (no payment), used internally
+async function _generateDirect(name, age, interests, theme) {
+  const s = SETTINGS[interests[0]] || SETTINGS['Animals'];
+
+  showView('generating');
+  document.getElementById('gen-name-display').textContent = name;
+
+  const steps = ['Dreaming up the world…', `Writing ${name}'s adventure…`, 'Painting the illustrations…', 'Putting it all together…'];
+  let pct = 0, si = 0;
+  const bar = document.getElementById('gen-bar');
+  const statusEl = document.getElementById('gen-status');
+
+  const tick = setInterval(() => {
+    pct = Math.min(92, pct + 3 + Math.random() * 5);
+    bar.style.width = pct + '%';
+    if (si < steps.length && pct > si * 22) {
+      if (statusEl) statusEl.textContent = steps[si++];
+    }
+  }, 700);
+
+  try {
+    const storyData = await generateViaServer(name, age, interests, theme);
+
+    clearInterval(tick);
+    bar.style.width = '100%';
+
+    currentStory = {
+      id: Date.now().toString(),
+      name, age, interests, theme,
+      title: storyData.title,
+      coverText: `A story for ${name}, age ${age}`,
+      coverImage: storyData.coverImage || null,
+      pages: storyData.pages.map((p, i) => ({
+        text: p.text,
+        image: p.image || null,
+        bg: i === 5 ? 'cozy' : s.bg,
+        phase: i + 1,
+      })),
+      createdAt: Date.now(),
+      setting: s,
+      source: 'gemini',
+    };
+
+    currentPage = 0;
+    totalPages = currentStory.pages.length + 1;
+    setTimeout(() => openReader(), 400);
+  } catch (err) {
+    clearInterval(tick);
+    console.error('Generation error:', err);
+    bar.style.width = '100%';
+    if (statusEl) statusEl.textContent = 'Using built-in story…';
+    currentStory = buildStory(name, age, interests, theme);
+    currentPage = 0;
+    totalPages = currentStory.pages.length + 1;
+    setTimeout(() => openReader(), 600);
+  }
+}
+
+// ─────────────────────────────────────────────
+// READER
+// ─────────────────────────────────────────────
+function openReader() {
+  showView('reader');
+  renderSpread();
+  renderDots();
+}
+
+function renderSpread() {
+  const spread = document.getElementById('reader-spread');
+  const story = currentStory;
+  spread.classList.add('fade');
+
+  setTimeout(() => {
+    if (currentPage === 0) {
+      // Cover
+      const s = story.setting;
+      if (story.coverImage) {
+        spread.innerHTML = `
+          <div class="cover-page">
+            <img class="cover-img" src="${story.coverImage}" alt="Cover">
+            <div class="cover-overlay">
+              <p class="cover-badge">A Hush original</p>
+              <h1 class="cover-title">${story.title}</h1>
+              <p class="cover-sub">${story.coverText}</p>
+            </div>
+          </div>`;
+      } else {
+        spread.innerHTML = `
+          <div class="cover-page svg-cover" style="background:linear-gradient(160deg,${s.hue},#0D1F16)">
+            <div class="cover-bg">${makeSVG(s.bg, 0, s.accent)}</div>
+            <p class="label" style="z-index:1;position:relative;margin-bottom:12px">A Hush original</p>
+            <h1 style="color:${s.accent}">${story.title}</h1>
+            <p class="cover-sub">${story.coverText}</p>
+          </div>`;
+      }
+    } else {
+      const page = story.pages[currentPage - 1];
+      const s = story.setting;
+      const illoHtml = page.image
+        ? `<img class="page-img" src="${page.image}" alt="Illustration for page ${currentPage}">`
+        : `${makeSVG(page.bg, page.phase, s.accent)}<div class="page-num">— ${currentPage} —</div>`;
+      spread.innerHTML = `
+        <div class="reader-illo" style="${page.image ? '' : 'background:' + s.hue}">
+          ${illoHtml}
+        </div>
+        <div class="reader-text">
+          <p class="chapter">${story.name}'s story · Page ${currentPage}</p>
+          <p class="story-text">${page.text.replace(/(['"""])/g,'<em>$1</em>')}</p>
+        </div>`;
+    }
+
+    document.getElementById('reader-title-bar').textContent = story.title;
+    document.getElementById('reader-page-label').textContent = currentPage === 0 ? 'Cover' : `${currentPage} / ${totalPages - 1}`;
+    document.getElementById('prev-btn').disabled = currentPage === 0;
+    document.getElementById('next-btn').disabled = currentPage === totalPages - 1;
+
+    spread.classList.remove('fade');
+    updateDots();
+  }, 200);
+}
+
+function turnPage(dir) {
+  const next = currentPage + dir;
+  if (next < 0 || next > totalPages - 1) return;
+  currentPage = next;
+  renderSpread();
+}
+
+function renderDots() {
+  const dots = document.getElementById('page-dots');
+  dots.innerHTML = Array.from({length: totalPages}, (_, i) =>
+    `<div class="pdot${i === 0 ? ' on' : ''}" onclick="jumpPage(${i})"></div>`
+  ).join('');
+}
+
+function updateDots() {
+  document.querySelectorAll('.pdot').forEach((d, i) => d.classList.toggle('on', i === currentPage));
+}
+
+function jumpPage(n) {
+  currentPage = n;
+  renderSpread();
+}
+
+// ─────────────────────────────────────────────
+// LIBRARY
+// ─────────────────────────────────────────────
+function getStories() {
+  try { return JSON.parse(localStorage.getItem('hush_stories') || '[]'); } catch { return []; }
+}
+function setStories(arr) { localStorage.setItem('hush_stories', JSON.stringify(arr)); }
+
+function saveCurrentStory() {
+  if (!currentStory) return;
+  const stories = getStories();
+  const exists = stories.find(s => s.id === currentStory.id);
+  if (!exists) {
+    // Strip base64 images before saving (too large for localStorage)
+    const toSave = {
+      ...currentStory,
+      coverImage: null,
+      pages: currentStory.pages.map(p => ({ ...p, image: null })),
+    };
+    stories.unshift(toSave);
+    setStories(stories);
+  }
+  const btn = document.getElementById('btn-save');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Saved!`;
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  setTimeout(() => {
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save to library`;
+    btn.style.color = '';
+    btn.style.borderColor = '';
+  }, 2500);
+}
+
+function renderLibrary() {
+  const stories = getStories();
+  const grid = document.getElementById('story-grid');
+  const empty = document.getElementById('empty-lib');
+
+  if (stories.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = stories.map(story => {
+    const s = story.setting || { bg: 'forest', hue: '#122A1D', accent: '#D4A853' };
+    const date = new Date(story.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    const miniSVG = makeSVG(s.bg, 1, s.accent);
+    return `
+      <div class="story-card" onclick="openSavedStory('${story.id}')">
+        <div class="card-cover" style="background:${s.hue}">
+          ${miniSVG}
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(transparent,rgba(0,0,0,.6))">
+            <p style="font-family:'Lora',serif;font-size:15px;font-weight:600;line-height:1.3;color:#fff">${story.title}</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-meta">For ${story.name}, age ${story.age} · ${date}</p>
+          <p class="card-meta" style="margin-top:3px">${story.theme}</p>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openSavedStory(id) {
+  const stories = getStories();
+  const story = stories.find(s => s.id === id);
+  if (!story) return;
+  currentStory = story;
+  currentPage = 0;
+  totalPages = story.pages.length + 1;
+  openReader();
+}
+
+// ─────────────────────────────────────────────
+// KEYBOARD + TOUCH NAV
+// ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const reader = document.getElementById('view-reader');
+  if (!reader.classList.contains('active')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); turnPage(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); turnPage(-1); }
+});
+
+let _tx = 0, _ty = 0;
+document.addEventListener('touchstart', e => {
+  if (!document.getElementById('view-reader').classList.contains('active')) return;
+  _tx = e.touches[0].clientX;
+  _ty = e.touches[0].clientY;
+}, {passive: true});
+document.addEventListener('touchend', e => {
+  if (!document.getElementById('view-reader').classList.contains('active')) return;
+  const dx = e.changedTouches[0].clientX - _tx;
+  const dy = e.changedTouches[0].clientY - _ty;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) turnPage(dx < 0 ? 1 : -1);
+}, {passive: true});
+
+// ─────────────────────────────────────────────
+// NAV SCROLL TRANSITION
+// ─────────────────────────────────────────────
+(function() {
+  const nav = document.getElementById('app-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 16);
+  }, { passive: true });
+})();
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+(function() {
+  const params = new URLSearchParams(location.search);
+  const sessionId  = params.get('session_id');
+  const cancelled  = params.get('cancelled');
+  const name       = params.get('name');
+  const startCreate = params.get('create');
+  const paramAge   = params.get('age');
+  const paramInterests = params.get('interests');
+  const paramTheme = params.get('theme');
+
+  if (paramAge) selectedAge = paramAge;
+  if (paramInterests) paramInterests.split(',').forEach(i => { const t = i.trim(); if (t) selectedInterests.add(t); });
+  if (paramTheme) selectedTheme = paramTheme;
+  if (name) document.getElementById('c-name').value = name;
+
+  if (sessionId) {
+    // Returning from Stripe payment — generate the story
+    generateAfterPayment(sessionId);
+  } else if (cancelled) {
+    // User cancelled payment — go back to library
+    renderLibrary();
+  } else if (startCreate !== null && name && paramAge && paramTheme) {
+    // Landing page sent all params — go to checkout
+    createStory();
+  } else if (startCreate !== null || name) {
+    showView('creator');
+  } else {
+    renderLibrary();
+  }
+})();
+</script>
+</body>
+</html>
