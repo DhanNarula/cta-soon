@@ -158,6 +158,7 @@ const server = serve({
 
           const origin = new URL(req.url).origin;
           const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
             line_items: [{
               price_data: {
                 currency: "usd",
@@ -170,7 +171,6 @@ const server = serve({
               quantity: 1,
             }],
             mode: "payment",
-            automatic_payment_methods: { enabled: true },
             metadata: {
               name,
               age: age || "4–5",
