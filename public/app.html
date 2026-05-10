@@ -738,7 +738,7 @@ async function createStory() {
   } catch (err) {
     console.error('Checkout error:', err);
     if (btn) { btn.disabled = false; btn.textContent = '✦ Create My Story'; }
-    alert('Could not start checkout. Please try again.');
+    alert('Checkout error: ' + (err && err.message ? err.message : String(err)));
   }
 }
 
